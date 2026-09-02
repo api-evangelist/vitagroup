@@ -1,0 +1,53 @@
+generated: '2026-09-02'
+method: probed
+source: https://sandkiste.ehrbase.org/ehrbase/rest/status
+limit_count: 0
+note: >-
+  No rate limits are published and none were observed. This is a structural consequence
+  of the product, not an oversight: HIP EHRbase runs on the customer's own
+  infrastructure, so there is no vendor-imposed quota to publish — throughput is
+  whatever the operator's deployment sustains. What IS missing is any documented
+  guidance on the limits an operator should expect or configure.
+limits: []
+response_headers:
+  observed: []
+  documented: []
+  detail: >-
+    A live unauthenticated GET https://sandkiste.ehrbase.org/ehrbase/rest/status
+    returned 200 with no X-RateLimit-*, no RateLimit-*, and no Retry-After. The
+    response carried only cache-control, security headers (x-content-type-options,
+    x-frame-options: DENY, strict-transport-security: max-age=31536000) and Cloudflare
+    edge headers.
+exhaustion_status_code: null
+retry_after: false
+spec_declarations:
+  status_429_declared_in_any_spec: false
+  detail: >-
+    None of the four published OpenAPI documents declares a 429 response on any
+    operation.
+concurrency_controls_that_do_exist:
+- mechanism: optimistic locking
+  detail: >-
+    If-Match on update and delete operations, 412 on a stale version. This bounds
+    concurrent WRITES to the same object but is not a rate limit.
+- mechanism: event-trigger worker pool
+  setting: eventTrigger.workers
+  detail: Caps parallel trigger evaluation; server-side tuning, not a client-facing limit.
+- mechanism: rollback serialization
+  detail: >-
+    A transaction-compensation rollback blocks a second rollback against the same
+    ehr_id until the first finishes or times out.
+  source: https://docs.ehrbase.org/docs/EHRbase/Enterprise-Features/Transaction-Compensation
+- mechanism: HTTP event-trigger request timeout
+  setting: request-timeout per configured provider
+  example: 30S
+probes:
+- url: https://sandkiste.ehrbase.org/ehrbase/rest/status
+  status: 200
+  rate_limit_headers: none
+gaps:
+- No rate-limit signalling of any kind, so a client cannot back off intelligently — it
+  can only observe latency or failure.
+- No 429 declared in any contract, so a generated client has no handler for exhaustion
+  even when an operator puts a gateway in front of EHRbase.
+- No published sizing or throughput guidance for operators.

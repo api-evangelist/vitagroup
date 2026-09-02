@@ -1,0 +1,96 @@
+generated: '2026-09-02'
+method: probed
+source: live HTTP probes of every apis.yml host and OpenAPI servers[] host
+note: >-
+  Every /.well-known/ path was probed on all four vitagroup-controlled hosts and NONE
+  returned a document. No WellKnown, APICatalog or SecurityTxt pointer is wired into
+  apis.yml, because this file records an absence, not a presence. www.vitagroup.ag and
+  hip.vitagroup.ag answer 404 with a full WordPress 404 page; docs.ehrbase.org answers
+  404 with the Docusaurus 404 shell; sandkiste.ehrbase.org 302-redirects every
+  /.well-known/* path to /login (a Vaadin SPA login route), which is a redirect to an
+  app screen and not a served document.
+hosts:
+- host: www.vitagroup.ag
+  documents:
+  - path: /.well-known/security.txt
+    status: 404
+  - path: /.well-known/openid-configuration
+    status: 404
+  - path: /.well-known/oauth-authorization-server
+    status: 301
+    note: 301 to the same path with a trailing slash, which then 404s
+  - path: /.well-known/api-catalog
+    status: 404
+  - path: /.well-known/ai-plugin.json
+    status: 404
+  - path: /.well-known/agent-card.json
+    status: 404
+  - path: /.well-known/agent.json
+    status: 404
+- host: hip.vitagroup.ag
+  documents:
+  - path: /.well-known/security.txt
+    status: 404
+  - path: /.well-known/openid-configuration
+    status: 404
+  - path: /.well-known/oauth-authorization-server
+    status: 301
+    note: 301 to the same path with a trailing slash, which then 404s
+  - path: /.well-known/api-catalog
+    status: 404
+  - path: /.well-known/ai-plugin.json
+    status: 404
+  - path: /.well-known/agent-card.json
+    status: 404
+  - path: /.well-known/agent.json
+    status: 404
+- host: docs.ehrbase.org
+  documents:
+  - path: /.well-known/security.txt
+    status: 404
+  - path: /.well-known/openid-configuration
+    status: 404
+  - path: /.well-known/oauth-authorization-server
+    status: 404
+  - path: /.well-known/api-catalog
+    status: 404
+  - path: /.well-known/ai-plugin.json
+    status: 404
+  - path: /.well-known/agent-card.json
+    status: 404
+  - path: /.well-known/agent.json
+    status: 404
+- host: sandkiste.ehrbase.org
+  documents:
+  - path: /.well-known/security.txt
+    status: 302
+    note: redirects to https://sandkiste.ehrbase.org/login — no document served
+  - path: /.well-known/openid-configuration
+    status: 302
+    note: redirects to /login
+  - path: /.well-known/oauth-authorization-server
+    status: 302
+    note: redirects to /login
+  - path: /.well-known/api-catalog
+    status: 302
+    note: redirects to /login
+  - path: /.well-known/ai-plugin.json
+    status: 302
+    note: redirects to /login
+  - path: /.well-known/agent-card.json
+    status: 302
+    note: redirects to /login
+  - path: /.well-known/agent.json
+    status: 302
+    note: redirects to /login
+llms_txt:
+- url: https://www.vitagroup.ag/llms.txt
+  status: 404
+- url: https://hip.vitagroup.ag/llms.txt
+  status: 404
+- url: https://docs.ehrbase.org/llms.txt
+  status: 404
+summary:
+  hosts_probed: 4
+  paths_probed: 28
+  documents_served: 0

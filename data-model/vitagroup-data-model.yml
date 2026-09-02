@@ -1,0 +1,246 @@
+generated: '2026-09-02'
+method: derived
+source: >-
+  openapi/vitagroup-hip-ehrbase-openehr.json ($ref graph and path hierarchy),
+  openapi/vitagroup-hip-ehrbase-admin.json,
+  openapi/vitagroup-hip-ehrbase-item-tags.json
+docs: https://docs.ehrbase.org/docs/EHRbase/openEHR-Introduction/Data-Models
+note: >-
+  The entity graph is not vitagroup's invention — it is the openEHR Reference Model,
+  which is why it is stable and why an integrator can learn it once and reuse it across
+  every openEHR vendor. Entities and relationships below are derived from the path
+  hierarchy and the 67 component schemas in the published openEHR spec; nothing was
+  added that is not addressable in the contract.
+identifier_conventions:
+  ehr_id: UUID
+  versioned_object_uid: UUID
+  version_uid: >-
+    Composite openEHR VERSION UID of the form
+    {versioned_object_uid}::{creating_system_id}::{version_tree_id} — the trailing
+    integer increments per version. This is the value carried in ETag and required in
+    If-Match.
+  template_id: string, operator-assigned when the operational template is uploaded
+  qualified_query_name: reverse-domain-style name, versioned separately
+entities:
+- name: EHR
+  description: >-
+    The container for one subject's entire health record. Created empty, then
+    populated. Addressed at /rest/openehr/v1/ehr/{ehr_id}.
+  key: ehr_id
+  alternate_key: (subject_id, subject_namespace) — enforced unique, 409 on collision
+  operations:
+  - createEhr
+  - createEhrWithId
+  - getEhrById
+  - getEhrBySubject
+- name: EHR_STATUS
+  description: >-
+    The mutable, versioned status of an EHR — subject reference, queryable and
+    modifiable flags, other_details. Exactly one per EHR, versioned independently.
+  operations:
+  - getEhrStatusVersionByTime
+  - getEhrStatusByVersionId
+  - updateEhrStatus
+- name: VERSIONED_EHR_STATUS
+  description: The version container for EHR_STATUS, exposing revision history.
+  operations:
+  - retrieveVersionedEhrStatusByEhr
+  - retrieveVersionOfEhrStatusByTime
+  - retrieveVersionOfEhrStatusByVersionUid
+  - retrieveVersionedEhrStatusRevisionHistoryByEhr
+- name: COMPOSITION
+  description: >-
+    The unit of clinical commit — one encounter, report, observation set or care-plan
+    entry, structured according to an operational template. This is the object almost
+    every write creates.
+  operations:
+  - createComposition
+  - updateComposition
+  - deleteComposition
+  - getComposition
+- name: VERSIONED_COMPOSITION
+  description: The version container for a COMPOSITION, exposing revision history.
+  operations:
+  - retrieveVersionedCompositionByVersionedObjectUid
+  - retrieveVersionOfCompositionByTime
+  - retrieveVersionOfCompositionByVersionUid
+  - retrieveVersionedCompositionRevisionHistoryByEhr
+- name: CONTRIBUTION
+  description: >-
+    The unit of change — a transactional set of versions committed together with one
+    AUDIT_DETAILS. The rollback / transaction-compensation surface operates at this
+    granularity.
+  operations:
+  - createContribution
+  - getContribution
+- name: AUDIT_DETAILS
+  description: >-
+    Committer, change type, time and description attached to every CONTRIBUTION.
+    Supplied by the client in the openEHR-AUDIT_DETAILS request header.
+- name: DIRECTORY
+  description: >-
+    A versioned FOLDER tree per EHR, organising compositions. One directory per EHR.
+  operations:
+  - createDirectory
+  - updateDirectory
+  - deleteDirectory
+  - getFolderInDirectory
+  - getFolderInDirectoryVersionAtTime
+- name: FOLDER
+  description: A node in the DIRECTORY tree, holding references to compositions and child folders.
+- name: OPERATIONAL_TEMPLATE
+  description: >-
+    The ADL 1.4 or ADL 2 template that constrains what a COMPOSITION may contain. The
+    schema contract for clinical data. Projections available as WebTemplate and as a
+    generated example instance.
+  key: template_id
+  operations:
+  - createTemplateClassic
+  - getTemplatesClassic
+  - getTemplateClassic
+  - getWebTemplate
+  - getTemplateExample
+  - createTemplateNew
+  - getTemplatesNew
+  - getTemplateNew
+- name: STORED_QUERY
+  description: >-
+    A named, versioned AQL query registered on the server and executed by name, so
+    clients do not embed query text.
+  key: (qualified_query_name, version)
+  operations:
+  - putStoredQuery
+  - getStoredQueryList
+  - getStoredQueryVersion
+  - executeStoredQuery
+- name: ITEM_TAG
+  description: >-
+    Experimental key/value annotation attached to an EHR_STATUS or COMPOSITION at a
+    given openEHR path. Not part of the openEHR versioning model.
+  operations:
+  - upsertCompositionItemTags
+  - getCompositionItemTags
+  - deleteCompositionItemTags
+  - upsertEhrStatusItemTags
+  - getEhrStatusItemTags
+  - deleteEhrStatusItemTags
+- name: EHR_MERGE_STATUS
+  description: >-
+    HIP EHRbase record of a merge of a source EHR into a target EHR, including
+    cascading merge history.
+  operations:
+  - mergeEhrs
+  - getMergeStatusList
+  - getMergeDetails
+  - getMergeTarget
+- name: TENANT
+  description: >-
+    HIP EHRbase enterprise tenant, backed by a Keycloak realm and a dedicated database
+    schema.
+  operations:
+  - getTenants
+  - storeTenant
+  - deleteTenant
+- name: EVENT_TRIGGER
+  description: >-
+    HIP EHRbase enterprise rule binding an AQL condition on composition or EHR_STATUS
+    lifecycle to an HTTP, AMQP, Kafka or log notification.
+  operations:
+  - store
+  - getAll
+  - getBy
+  - activate
+  - deleteBy
+relationships:
+- from: EHR
+  to: EHR_STATUS
+  type: has_one
+  via: path /rest/openehr/v1/ehr/{ehr_id}/ehr_status
+- from: EHR
+  to: COMPOSITION
+  type: has_many
+  via: path /rest/openehr/v1/ehr/{ehr_id}/composition/{versioned_object_uid}
+- from: EHR
+  to: CONTRIBUTION
+  type: has_many
+  via: path /rest/openehr/v1/ehr/{ehr_id}/contribution/{contribution_uid}
+- from: EHR
+  to: DIRECTORY
+  type: has_one
+  via: path /rest/openehr/v1/ehr/{ehr_id}/directory
+- from: DIRECTORY
+  to: FOLDER
+  type: has_many
+  via: nested folders[] in the FOLDER schema
+- from: FOLDER
+  to: COMPOSITION
+  type: has_many
+  via: item[] object references
+- from: COMPOSITION
+  to: VERSIONED_COMPOSITION
+  type: belongs_to
+  via: versioned_object_uid
+- from: EHR_STATUS
+  to: VERSIONED_EHR_STATUS
+  type: belongs_to
+  via: versioned_object_uid
+- from: CONTRIBUTION
+  to: AUDIT_DETAILS
+  type: has_one
+  via: audit_details field
+- from: CONTRIBUTION
+  to: COMPOSITION
+  type: has_many
+  via: versions[] object references — the set of versions committed together
+- from: COMPOSITION
+  to: CONTRIBUTION
+  type: belongs_to
+  via: >-
+    ORIGINAL_VERSION.contribution — since 2.30.0 this is a REFERENCE to the
+    CONTRIBUTION, not the embedded object
+- from: COMPOSITION
+  to: OPERATIONAL_TEMPLATE
+  type: belongs_to
+  via: archetype_details.template_id
+- from: ITEM_TAG
+  to: COMPOSITION
+  type: belongs_to
+  via: path /ehr/{ehr_id}/composition/{versioned_object_uid}/item_tag
+- from: ITEM_TAG
+  to: EHR_STATUS
+  type: belongs_to
+  via: path /ehr/{ehr_id}/ehr_status/{versioned_object_uid}/item_tag
+- from: EHR_MERGE_STATUS
+  to: EHR
+  type: belongs_to
+  via: source and target query parameters
+- from: TENANT
+  to: EHR
+  type: has_many
+  via: schema-per-tenant isolation, not an addressable path
+- from: EVENT_TRIGGER
+  to: COMPOSITION
+  type: watches
+  via: definition.data_type
+- from: STORED_QUERY
+  to: COMPOSITION
+  type: queries
+  via: AQL CONTAINS over the RM hierarchy
+temporal_model:
+  append_only: true
+  detail: >-
+    Nothing in the openEHR surface is overwritten. An update creates a new version;
+    a delete creates a version whose lifecycle state is "deleted". Every versioned
+    entity is readable at an arbitrary instant via the version_at_time query
+    parameter (5 operations) or by explicit version_uid. Physical removal exists only
+    behind the Admin API.
+counts:
+  entities: 16
+  relationships: 18
+  schemas_in_openehr_spec: 67
+  schemas_in_admin_spec: 39
+gaps:
+- The published specs declare no discriminated $ref for polymorphic RM types (ENTRY,
+  ITEM, DATA_VALUE subtypes), so a generated client sees loose objects where the RM
+  defines a class hierarchy.
+- No entity-relationship diagram is published by vitagroup; this graph was derived.

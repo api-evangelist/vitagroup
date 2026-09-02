@@ -1,0 +1,76 @@
+generated: '2026-09-02'
+method: generated
+source: openapi/vitagroup-hip-ehrbase-enterprise.yml
+overlay: 1.0.0
+info:
+  title: API Evangelist enhancements — HIP EHRbase Enterprise API
+  version: 1.0.0
+extends: ../openapi/vitagroup-hip-ehrbase-enterprise.yml
+x-note: >-
+  This is the only one of the four published documents whose servers[] block is already
+  correct — a templated https://{ehrbaseBaseUrl}, which honestly says "the host is your
+  deployment". It is left untouched. The enhancements here are semantic: the reversal
+  operation, the event surface, and the missing error declarations.
+actions:
+- target: $.info
+  description: Record provenance and the commercial boundary.
+  update:
+    x-provider: vitagroup AG
+    x-provider-slug: vitagroup
+    x-apis-io-slug: vitagroup
+    x-availability: >-
+      HIP EHRbase enterprise plugins only. These operations do not exist in the
+      Apache-2.0 open-source EHRbase build.
+    contact:
+      name: vitagroup AG
+      url: https://hip.vitagroup.ag/en/contact/
+      email: info@vitagroup.ag
+- target: $.paths['/plugin/transaction-management/ehr/{ehr_id}/contribution/{contribution_id}/rollback'].post
+  description: >-
+    Annotate the reversal operation. This is the provider's only published undo, and
+    the contract says nothing about its semantics or its bounds.
+  update:
+    x-reversibility:
+      role: reversal
+      reverses: CONTRIBUTION
+      grade: documented
+      window_stated: false
+      semantics: >-
+        Rolls back every object in the contribution serially, in inverse order, in one
+        database transaction, following the Saga pattern. An exception representing a
+        500 or 501 rolls back the whole compensation. On success the contribution is
+        deleted. Uses openEHR CONTRIBUTION objects for the rollback.
+      concurrency: >-
+        ehr_id, contribution_id and status are persisted before the rollback begins; a
+        concurrent rollback on the same ehr_id blocks until the first completes or
+        times out.
+      tenant_bound: true
+      docs: https://docs.ehrbase.org/docs/EHRbase/Enterprise-Features/Transaction-Compensation
+- target: $.paths['/plugin/event-trigger/service/'].post
+  description: Point at the event catalogue derived from the Event Trigger documentation.
+  update:
+    x-event-surface:
+      transports: [http, amqp, kafka, logger]
+      data_types: [COMPOSITION, EHR_STATUS]
+      event_types: [CREATE, UPDATE, DELETE, HARD_DELETE]
+      modes: [BEFORE, AFTER]
+      asyncapi_published: false
+      payload_shape: defined by the trigger's AQL SELECT, not by the provider
+      artifact: asyncapi/vitagroup-event-trigger-webhooks.yml
+      docs: https://docs.ehrbase.org/docs/EHRbase/Enterprise-Features/Event-Trigger
+- target: $
+  description: Record contract gaps.
+  update:
+    x-contract-gaps:
+      auth_errors_declared: false
+      note: >-
+        securitySchemes.bearerAuth is declared and applied globally, and the description
+        says "Requires authorization with a tenant user upfront", yet no 401 or 403
+        response is declared on any operation. Only 200 and 404 appear.
+      error_bodies: >-
+        404 responses declare text/plain with a bare string schema; there is no
+        structured error envelope.
+    x-tenancy:
+      required: true
+      note: Operations act within the tenant of the presented bearer token.
+      docs: https://docs.ehrbase.org/docs/EHRbase/Enterprise-Features/Multi-Tenancy

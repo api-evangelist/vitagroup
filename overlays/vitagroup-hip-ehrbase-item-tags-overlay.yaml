@@ -1,0 +1,58 @@
+generated: '2026-09-02'
+method: generated
+source: openapi/vitagroup-hip-ehrbase-item-tags.json
+overlay: 1.0.0
+info:
+  title: API Evangelist enhancements — HIP EHRbase Item Tag Experimental API
+  version: 1.0.0
+extends: ../openapi/vitagroup-hip-ehrbase-item-tags.json
+x-note: >-
+  The thinnest of the four published contracts: 6 operations, one component schema, and
+  NO error responses declared at all — only 200 and 204. It is explicitly experimental,
+  which is recorded here so a consumer does not mistake it for a stable surface.
+actions:
+- target: $.info
+  description: Record provenance and stability.
+  update:
+    x-provider: vitagroup AG
+    x-provider-slug: vitagroup
+    x-apis-io-slug: vitagroup
+    x-stability: experimental
+    x-stability-note: >-
+      The provider titles this document "EHRbase Item Tag Experimental API" and serves
+      it under the /rest/experimental/ path namespace. Shape and semantics may change
+      without a major version bump.
+    contact:
+      name: vitagroup AG
+      url: https://hip.vitagroup.ag/en/contact/
+- target: $.servers
+  description: Replace the springdoc-generated localhost placeholder.
+  update:
+  - url: https://sandkiste.ehrbase.org/ehrbase
+    description: vitagroup's public EHRbase sandbox, probed 200 on 2026-09-02.
+  - url: https://{host}/{basePath}
+    description: A customer-operated HIP EHRbase deployment.
+    variables:
+      host:
+        default: hip-ehrbase.example.org
+      basePath:
+        default: ehrbase
+- target: $
+  description: Record what the contract omits.
+  update:
+    x-contract-gaps:
+      error_responses_declared: false
+      note: >-
+        No 4xx or 5xx response is declared on any of the six operations, so a generated
+        client has no error handling for a missing EHR, a missing versioned object, or
+        an auth failure.
+      securityschemes_declared: false
+    x-model-note: >-
+      ITEM_TAGs sit OUTSIDE the openEHR versioning model — they are mutable annotations
+      on a versioned object, not versioned content. A tag change leaves no audit trail
+      in the record.
+- target: $.tags
+  description: Add a tag set — the upstream document declares none.
+  update:
+  - name: Item Tag
+    description: Key/value annotations on EHR_STATUS and COMPOSITION versioned objects.

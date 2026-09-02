@@ -1,0 +1,86 @@
+generated: '2026-09-02'
+method: generated
+source: openapi/vitagroup-hip-ehrbase-admin.json
+overlay: 1.0.0
+info:
+  title: API Evangelist enhancements — HIP EHRbase Admin API
+  version: 1.0.0
+extends: ../openapi/vitagroup-hip-ehrbase-admin.json
+x-note: >-
+  Two substantive corrections: the localhost servers[] placeholder, and
+  deleteContribution, which the provider withdrew in 2.0.0 but never flagged as
+  deprecated — a generated client currently exposes a method that can only return 501.
+actions:
+- target: $.info
+  description: Record provenance.
+  update:
+    x-provider: vitagroup AG
+    x-provider-slug: vitagroup
+    x-apis-io-slug: vitagroup
+    x-danger: >-
+      Every operation in this document is administrative and outside the openEHR
+      versioning model. Deletes here are PHYSICAL and irreversible; mergeEhrs has no
+      published unmerge. Treat as terminal.
+    contact:
+      name: vitagroup AG
+      url: https://hip.vitagroup.ag/en/contact/
+- target: $.servers
+  description: Replace the springdoc-generated localhost placeholder.
+  update:
+  - url: https://sandkiste.ehrbase.org/ehrbase
+    description: vitagroup's public EHRbase sandbox, probed 200 on 2026-09-02.
+  - url: https://{host}/{basePath}
+    description: A customer-operated HIP EHRbase deployment.
+    variables:
+      host:
+        default: hip-ehrbase.example.org
+      basePath:
+        default: ehrbase
+- target: $.paths['/rest/admin/ehr/{ehr_id}/contribution/{contribution_id}'].delete
+  description: >-
+    Flag the withdrawn operation. Its own summary says "Not supported since 2.0.0" and
+    its only non-2xx response is a 501, but deprecated:true is not set.
+  update:
+    deprecated: true
+    x-withdrawn-in: 2.0.0
+    x-replacement: >-
+      On HIP EHRbase, use the enterprise Transaction Compensation rollback operation
+      (operationId `rollback`) at
+      /plugin/transaction-management/ehr/{ehr_id}/contribution/{contribution_id}/rollback
+- target: $
+  description: Record the authorization model the contract implies but does not declare.
+  update:
+    x-authentication:
+      declared_in_spec: false
+      required_role: admin
+      role_name_configurable_via: SECURITY_OAUTH2ADMINROLE
+      claim_paths: [realm_access.roles, scope]
+      note: >-
+        Every operation declares 401 and 403 responses, so auth is clearly required,
+        yet no securityScheme is declared and no security requirement is applied.
+      artifact: authentication/vitagroup-authentication.yml
+    x-reversibility:
+      status: none
+      note: >-
+        No reversal exists for any delete in this document, and the provider states
+        that unmerge "is not possible at the moment" despite storing the data for it.
+      artifact: conventions/vitagroup-conventions.yml
+- target: $.tags
+  description: Add a tag set — the upstream document declares none.
+  update:
+  - name: Admin EHR
+    description: Physical update and delete of EHRs.
+  - name: Admin EHR Merge
+    description: Merging a source EHR into a target EHR, and reading merge status.
+  - name: Admin Composition
+    description: Physical delete of compositions.
+  - name: Admin Contribution
+    description: Contribution administration (delete withdrawn since 2.0.0).
+  - name: Admin Directory
+    description: Physical delete of directories.
+  - name: Admin Template
+    description: Replace and delete operational templates.
+  - name: Admin Query
+    description: Delete stored queries.
+  - name: Admin Status
+    description: Admin-gated server status.

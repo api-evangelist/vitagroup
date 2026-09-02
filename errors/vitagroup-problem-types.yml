@@ -1,0 +1,178 @@
+generated: '2026-09-02'
+method: derived
+source: >-
+  openapi/vitagroup-hip-ehrbase-openehr.json,
+  openapi/vitagroup-hip-ehrbase-admin.json,
+  openapi/vitagroup-hip-ehrbase-item-tags.json,
+  openapi/vitagroup-hip-ehrbase-enterprise.yml
+docs: https://docs.ehrbase.org/api/hip-ehrbase/openehr
+format: vendor
+rfc9457: false
+problem_json_media_type_used: false
+note: >-
+  Derived from the declared 4xx/5xx responses across all four published vitagroup
+  OpenAPI documents. HIP EHRbase does NOT use RFC 9457 / RFC 7807 —
+  application/problem+json appears nowhere in any spec. Errors carry the meaning in
+  the HTTP status code plus a human-readable body; there is no machine-readable error
+  code, type URI or field-level violation list. There is no published error-code
+  reference page to enrich these titles from, so titles and remediation below are the
+  provider's own response descriptions from the specs, condensed, and nothing has been
+  invented.
+envelope:
+  status_code: authoritative
+  body: >-
+    Unstructured. The openEHR responses declare */* or text/plain for error bodies;
+    the enterprise plugin declares text/plain for its 404s. No stable field names are
+    published, so a client cannot parse an error programmatically beyond the status.
+  fields: []
+problem_types:
+- status: 400
+  title: Bad Request
+  spec_occurrences: 7
+  applies_to:
+  - openehr
+  meaning: >-
+    The request URL or body could not be parsed, or has invalid content — including an
+    invalid version_at_time timestamp format, a malformed AQL query, or a composition
+    that fails validation against its operational template.
+  example_operations:
+  - createEhrWithId
+  - getEhrStatusVersionByTime
+  - updateDirectory
+  - executeAdHocQuery_1
+  retryable: false
+  remediation: >-
+    Fix the payload. Validate the composition against the operational template
+    (getTemplateExample returns a valid instance for the template) and check that any
+    version_at_time value is a valid ISO-8601 instant.
+- status: 401
+  title: Unauthorized
+  spec_occurrences: 14
+  applies_to:
+  - admin
+  meaning: Client credentials are invalid or have expired.
+  retryable: true
+  remediation: >-
+    Re-authenticate. Under OAUTH mode obtain a fresh JWT from the configured issuer;
+    under BASIC mode check the configured credentials. Note the open-source openEHR
+    spec declares no 401 at all even though the server can be configured to require
+    auth — a contract gap, recorded under gaps[].
+- status: 403
+  title: Forbidden — admin role missing
+  spec_occurrences: 14
+  applies_to:
+  - admin
+  meaning: >-
+    The caller authenticated but does not hold the admin role, so the Admin API is
+    refused. The role name is deployment-configurable (SECURITY_OAUTH2ADMINROLE,
+    default ADMIN) and is read from realm_access.roles or scope in the JWT.
+  retryable: false
+  remediation: >-
+    Use a principal that carries the configured admin role, or call the equivalent
+    standard openEHR operation instead of the admin one where one exists.
+- status: 404
+  title: Not Found
+  spec_occurrences: 26
+  applies_to:
+  - openehr
+  - admin
+  - enterprise
+  meaning: >-
+    The addressed resource does not exist. Distinct documented senses — the EHR with
+    ehr_id does not exist; the EHR with the supplied subject_id/subject_namespace pair
+    does not exist; the version_uid does not exist; no version exists at the requested
+    version_at_time; the template, stored query, directory, composition or
+    contribution could not be found; the given EHR id was not merged; no merge details
+    exist for the source/target pair; the event trigger UUID does not exist.
+  retryable: false
+  remediation: >-
+    A 404 on a versioned read is often a point-in-time miss rather than a missing
+    object — retry without version_at_time to confirm the object exists at all.
+- status: 409
+  title: Conflict — EHR already exists for subject
+  spec_occurrences: 2
+  applies_to:
+  - openehr
+  meaning: >-
+    A new EHR could not be created because an EHR already exists with the same
+    (subject id, namespace) pair, when EHR_STATUS is supplied.
+  example_operations:
+  - createEhr
+  - createEhrWithId
+  retryable: false
+  remediation: >-
+    Resolve the existing EHR with getEhrBySubject and use it, rather than creating a
+    second record for the same patient.
+- status: 412
+  title: Precondition Failed — stale If-Match
+  spec_occurrences: 3
+  applies_to:
+  - openehr
+  meaning: >-
+    The If-Match request header does not match the latest version on the server. The
+    response returns the current version_uid in the Location and ETag headers.
+  example_operations:
+  - updateEhrStatus
+  - updateComposition
+  - updateDirectory
+  retryable: true
+  remediation: >-
+    Read the current version_uid from the ETag on the 412 response, re-apply the
+    change against that version, and resubmit. This is the lost-update guard — do not
+    strip If-Match to get past it.
+- status: 422
+  title: Unprocessable Entity — resource still in use
+  spec_occurrences: 3
+  applies_to:
+  - admin
+  meaning: >-
+    A template could not be replaced or deleted because it is still used by at least
+    one composition; deleteAllTemplates refuses for the same reason.
+  example_operations:
+  - updateTemplate
+  - deleteTemplate
+  - deleteAllTemplates
+  retryable: false
+  remediation: >-
+    Find the dependent compositions with an AQL query over the template id and remove
+    or migrate them first.
+- status: 501
+  title: Not Implemented — contribution delete withdrawn
+  spec_occurrences: 1
+  applies_to:
+  - admin
+  meaning: >-
+    "Contribution delete is not supported since 2.0.0." The operation is still present
+    in the contract but always fails.
+  example_operations:
+  - deleteContribution
+  retryable: false
+  remediation: >-
+    Do not call deleteContribution. On HIP EHRbase, use the enterprise Transaction
+    Compensation rollback operation to reverse a contribution instead.
+  see_also: conventions/vitagroup-conventions.yml#reversibility
+- status: 500
+  title: Internal Server Error
+  spec_occurrences: 0
+  applies_to:
+  - enterprise
+  declared_in_spec: false
+  meaning: >-
+    Not declared in any published spec, but named in the Transaction Compensation
+    documentation: an exception representing a 500 or 501 during a rollback causes the
+    whole compensation transaction to be rolled back.
+  source: https://docs.ehrbase.org/docs/EHRbase/Enterprise-Features/Transaction-Compensation
+  retryable: true
+coverage:
+  documents_read: 4
+  distinct_status_codes: 8
+  total_error_responses_declared: 70
+gaps:
+- No RFC 9457 problem+json envelope, no machine-readable error code, and no error-code
+  reference page. A client branches on the HTTP status and reads prose.
+- The openEHR and Item Tag specs declare NO 401 or 403 responses at all, even though
+  the same server can be started with Basic or OAuth2 required. A generated client
+  built from those contracts will not expect an auth failure.
+- The Item Tag experimental spec declares no error responses whatsoever — only 200 and
+  204.
+- 500-class responses are not declared on any operation in any published document.

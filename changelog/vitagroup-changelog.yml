@@ -1,0 +1,113 @@
+generated: '2026-09-02'
+method: searched
+source: https://github.com/ehrbase/ehrbase/releases
+docs: https://github.com/ehrbase/ehrbase/blob/develop/CHANGELOG.md
+note: >-
+  vitagroup publishes no changelog on vitagroup.ag or hip.vitagroup.ag, and the
+  Releases section of docs.ehrbase.org is present in the site config but commented out
+  ("Excluded until ready") and currently renders only Docusaurus template posts. The
+  real, dated change record is the GitHub release stream and CHANGELOG.md of the
+  EHRbase repository, which vitagroup operates. Breaking changes are documented
+  separately in UPDATING.md, which is the more useful of the two for an integrator.
+scheme:
+  versioning: semver
+  declared: >-
+    "The format is based on Keep a Changelog, and this project adheres to Semantic
+    Versioning" — stated at the top of every release note.
+  keep_a_changelog: true
+  sections:
+  - Added
+  - Changed
+  - Fixed
+current_version: 2.35.1
+current_version_date: '2026-08-20'
+release_cadence_observed: >-
+  Eight releases between 2026-03-24 and 2026-08-20 — roughly monthly minor releases
+  with occasional patch releases.
+breaking_change_guide: https://github.com/ehrbase/ehrbase/blob/develop/UPDATING.md
+entries:
+- version: 2.35.1
+  date: '2026-08-20'
+  breaking: false
+  fixed:
+  - >-
+    Fixes possibly misplaced or removed folder items when retrieving a directory, and
+    corruption of folder history, introduced in 2.30.0 (PR #1648). The migration guide
+    warns that EHRbase cannot automatically distinguish corruption from user intent, so
+    no automatic correction is performed.
+- version: 2.35.0
+  date: '2026-08-17'
+  breaking: false
+  highlights: []
+  note: Release notes carry empty Added/Changed/Fixed sections.
+- version: 2.34.0
+  date: '2026-07-08'
+  breaking: false
+  highlights: []
+  note: Release notes carry empty Added/Changed/Fixed sections.
+- version: 2.33.0
+  date: '2026-06-16'
+  breaking: false
+  added:
+  - Option to rely on ValueSet expansion for FHIR terminology validation (PR #1636).
+  fixed:
+  - >-
+    String primitives that could represent compact temporals are no longer transformed
+    to extended format when executing AQL (openEHR SDK 2.33.1, SDK PR #752).
+  - Validation of DV_CODED_TEXT.value for template-defined terminologies (PR #1636).
+- version: 2.32.0
+  date: '2026-06-09'
+  breaking: false
+  added:
+  - Support for partial time (PR #1633 / SDK #747).
+  fixed:
+  - Terminology fixes (PR #1616).
+  - Improved external terminology validation performance and stability (PR #1623).
+  - Added metrics for external FHIR terminology server HTTP calls (PR #1623).
+  - Validation of limits of intervals with partial dates.
+  - Prevent mixing of long and short time formats.
+- version: 2.31.0
+  date: '2026-04-28'
+  breaking: false
+  changed:
+  - Improved template cache configuration (PR #1618).
+  - Improved performance of the template service (PR #1618).
+- version: 2.30.1
+  date: '2026-04-16'
+  breaking: false
+  highlights: []
+- version: 2.30.0
+  date: '2026-03-24'
+  breaking: true
+  added:
+  - RM constraint validation for DIRECTORY, behind a feature toggle (PR #1584).
+  changed:
+  - Update to Java 25 (PR #1595).
+  - Changed the history DB model for better compression — requires a full migration of
+    the history tables (PR #1584).
+  - Migrated management properties deprecated since Spring Boot 3.5 (PR #1605).
+  breaking_changes:
+  - >-
+    EHR responses now carry a REFERENCE to the EHR_STATUS object in ehr_status rather
+    than the object itself.
+  - >-
+    ORIGINAL_VERSION responses now carry a reference to the CONTRIBUTION object rather
+    than the object itself, on both the EHR Status and Composition endpoints.
+  - Folder responses no longer contain empty item and folders arrays.
+  - >-
+    "List stored queries" now returns an array directly, and each entry carries a new
+    `q` attribute with the plain AQL query.
+  - >-
+    DIRECTORY RM constraints are now validated by default; restore the old behaviour
+    with ehrbase.validation.validate-folders=false.
+  migration_guide: https://github.com/ehrbase/ehrbase/blob/develop/UPDATING.md
+gaps:
+- The changelog is not published on any vitagroup-branded surface. A HIP EHRbase
+  customer reading hip.vitagroup.ag or docs.ehrbase.org has no dated change record;
+  they have to find the GitHub repo.
+- The docs site has a Releases route wired but disabled in configuration.
+- Three of the eight most recent releases ship empty Added/Changed/Fixed sections, so
+  the version bump carries no readable statement of what changed.
+- No changelog at all is published for the HIP EHRbase enterprise plugins (Event
+  Trigger, Multi-Tenancy, Transaction Compensation, ATNA, Merge EHR), which are the
+  closed-source part.

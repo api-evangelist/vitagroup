@@ -1,0 +1,77 @@
+generated: '2026-09-02'
+method: generated
+source: >-
+  openapi/vitagroup-hip-ehrbase-openehr.json,
+  openapi/vitagroup-hip-ehrbase-admin.json,
+  openapi/vitagroup-hip-ehrbase-enterprise.yml
+note: >-
+  vitagroup publishes no AGENTS.md and no packaged agent skills — the vitagroupag and
+  ehrbase GitHub orgs were both searched and neither carries one. These three skills are
+  generated from the published contracts and documentation. Every operationId referenced
+  was grepped out of a spec in openapi/; none was invented. They deliberately cover the
+  three things an agent gets wrong on this API: creating a duplicate EHR, composing
+  invalid openEHR content, and stripping If-Match after a 412.
+skills:
+- name: create-ehr-and-commit-composition
+  file: vitagroup-create-ehr-and-commit-composition.md
+  api: vitagroup:hip-ehrbase-openehr
+  description: >-
+    Create an openEHR record and commit a first clinical composition against an
+    operational template, without duplicating a patient who already has a record.
+  operations:
+  - getEhrBySubject
+  - createEhr
+  - createEhrWithId
+  - getTemplatesClassic
+  - getWebTemplate
+  - getTemplateExample
+  - createComposition
+  - getComposition
+  key_hazard: >-
+    createEhr is not idempotent and the (subject_id, subject_namespace) pair is unique —
+    a blind retry either creates a duplicate or 409s. Prefer createEhrWithId with a
+    caller-generated UUID.
+- name: query-clinical-data-with-aql
+  file: vitagroup-query-clinical-data-with-aql.md
+  api: vitagroup:hip-ehrbase-openehr
+  description: >-
+    Read clinical data with the Archetype Query Language — ad-hoc and stored queries,
+    offset/fetch paging, and point-in-time retrieval.
+  operations:
+  - executeAdHocQuery
+  - executeAdHocQuery_1
+  - getStoredQueryList
+  - getStoredQueryList_1
+  - getStoredQueryVersion
+  - executeStoredQuery
+  - executeStoredQuery_1
+  - putStoredQuery
+  - getTemplatesClassic
+  - getWebTemplate
+  key_hazard: >-
+    Paging has no cursor and no total count, and there are no rate limits or 429s to
+    signal an expensive query. Bound it with fetch.
+- name: update-and-reverse-safely
+  file: vitagroup-update-and-reverse-safely.md
+  api: vitagroup:hip-ehrbase-openehr
+  description: >-
+    Update versioned objects without losing a concurrent writer's change, and
+    distinguish the reversible actions from the terminal ones.
+  operations:
+  - updateComposition
+  - updateEhrStatus
+  - updateDirectory
+  - deleteComposition
+  - getComposition
+  - rollback
+  - mergeEhrs
+  - deleteEhr
+  key_hazard: >-
+    Every /rest/admin/** delete is physical and irreversible, and mergeEhrs has no
+    published unmerge — the provider says so in its own docs. Never call these without
+    explicit human confirmation.
+skill_count: 3
+grounding:
+  operations_referenced: 22
+  all_verified_against_spec: true
+  invented_operations: 0

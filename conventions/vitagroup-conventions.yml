@@ -1,0 +1,231 @@
+generated: '2026-09-02'
+method: searched
+source: >-
+  https://docs.ehrbase.org/docs/EHRbase/Explore/openEHR-REST +
+  openapi/vitagroup-hip-ehrbase-openehr.json +
+  https://specifications.openehr.org/releases/ITS-REST/latest/
+note: >-
+  Most cross-cutting semantics here are not vitagroup inventions — they are the
+  openEHR ITS-REST specification, which EHRbase implements. That is the point: an
+  integrator who already speaks openEHR needs no vendor-specific connector. Where
+  EHRbase adds or omits something relative to the standard it is called out.
+auth:
+  style: operator-selected — none, HTTP Basic, or OAuth 2.0 bearer JWT
+  detail: authentication/vitagroup-authentication.yml
+  header: Authorization
+versioning:
+  api_versioning: URL path segment
+  pattern: /rest/openehr/v1/..., /rest/ecis/v1/..., /rest/experimental/tags/...
+  current: v1
+  experimental_namespace: >-
+    /rest/experimental/** marks surfaces the provider reserves the right to change —
+    currently the Item Tag API.
+  product_versioning: semantic versioning of the server (2.35.1), see lifecycle/
+  header: >-
+    openEHR-VERSION is an openEHR content header (audit versioning of the committed
+    object), NOT an API version selector.
+content_negotiation:
+  request_header: Content-Type
+  response_header: Accept
+  formats:
+  - application/json
+  - application/xml
+  - application/openehr.wt+json
+  - application/openehr.wt.flat.schema+json
+  - application/openehr.wt.structured.schema+json
+  note: >-
+    Beyond canonical openEHR JSON and XML, EHRbase accepts the SDT (simplified data
+    template) flat and structured formats, which is what most application code
+    actually posts. Documented at
+    https://docs.ehrbase.org/docs/EHRbase/Explore/Simplified-data-template/WebTemplate
+representation_control:
+  header: Prefer
+  values:
+  - return=minimal
+  - return=representation
+  operations_declaring_it: 12
+  effect: >-
+    return=representation makes a create/update echo the stored object back instead of
+    returning only a Location and ETag.
+  source: openapi/vitagroup-hip-ehrbase-openehr.json
+concurrency:
+  optimistic_locking: true
+  header: If-Match
+  operations_declaring_it: 4
+  operations:
+  - updateComposition
+  - updateEhrStatus
+  - updateDirectory
+  - deleteComposition
+  precondition_failure_status: 412
+  detail: >-
+    Updates and deletes of versioned objects require the preceding version UID in
+    If-Match; a stale value fails with 412 rather than silently overwriting. This is
+    the standard's answer to lost updates and is the strongest safety property in
+    the contract.
+idempotency:
+  supported: false
+  status: na
+  idempotency_key_header: null
+  detail: >-
+    There is no Idempotency-Key header and no request-deduplication window. Safety
+    against double submission is provided instead by If-Match optimistic locking on
+    updates and deletes, and by PUT /rest/openehr/v1/ehr/{ehr_id} (createEhrWithId),
+    which lets a caller choose the EHR identifier and therefore retry a create
+    idempotently. POST /rest/openehr/v1/ehr and POST .../composition are NOT
+    idempotent — a retried request creates a second object.
+  note: >-
+    Recorded honestly as unsupported. No Idempotency pointer is wired into apis.yml,
+    because the provider does not implement the pattern.
+audit:
+  header: openEHR-AUDIT_DETAILS
+  operations_declaring_it: 22
+  detail: >-
+    Write operations accept an openEHR AUDIT_DETAILS structure (committer, change
+    type, description) that is persisted with the CONTRIBUTION. Every change to a
+    versioned object is attributable; nothing is overwritten in place.
+  atna: >-
+    HIP EHRbase additionally emits IHE ATNA audit messages over Syslog/TLS for the
+    full operation list documented at
+    https://docs.ehrbase.org/docs/EHRbase/Enterprise-Features/ATNA
+pagination:
+  style: offset/limit on query results
+  params:
+  - name: offset
+    in: query
+    applies_to: AQL query execution
+  - name: fetch
+    in: query
+    applies_to: AQL query execution
+    meaning: number of rows to return
+  response_fields: []
+  detail: >-
+    AQL results carry the requested rows; there is no next-page cursor and no total
+    count in the envelope. A caller paginates by incrementing offset. AQL itself also
+    supports LIMIT/OFFSET inside the query string.
+  source: https://docs.ehrbase.org/docs/EHRbase/Explore/AQL/Common
+filtering_and_projection:
+  mechanism: Archetype Query Language (AQL)
+  detail: >-
+    Instead of per-endpoint filter query parameters, EHRbase exposes one query
+    language over the whole clinical record. SELECT chooses the projection, CONTAINS
+    navigates the archetype hierarchy, WHERE filters, ORDER BY sorts. Queries can be
+    executed ad hoc (POST /rest/openehr/v1/query/aql) or stored and called by name
+    and version (executeStoredQuery).
+  docs: https://docs.ehrbase.org/docs/EHRbase/Explore/AQL/Introduction
+point_in_time_retrieval:
+  param: version_at_time
+  occurrences: 5
+  detail: >-
+    Compositions, EHR_STATUS, directories and versioned objects can be read as of an
+    ISO-8601 instant. The record is append-only, so history is a first-class read
+    axis rather than an audit-log side channel.
+request_tracing:
+  request_id_header: null
+  detail: >-
+    No correlation-id header is documented or declared in any published spec. Runtime
+    observability is via the Spring Actuator /management endpoints (health, info,
+    metrics, prometheus), which are DISABLED by default and admin-gated when enabled.
+  source: https://docs.ehrbase.org/docs/EHRbase/Explore/Status-And-Metrics
+error_envelope:
+  format: vendor
+  rfc9457: false
+  detail: See errors/vitagroup-problem-types.yml
+rate_limit_signaling:
+  headers: []
+  detail: >-
+    None. See rate-limits/vitagroup-rate-limits.yml — no limits are published and no
+    rate-limit response headers were observed on the live sandbox.
+dry_run_mode:
+  supported: false
+  status: na
+  detail: >-
+    No preview/validate-only flag exists on write operations. The closest thing is
+    template validation: posting a composition against a stored operational template
+    is rejected with 400/422 if it does not validate, so the model catches malformed
+    clinical data — but there is no way to rehearse a write without performing it.
+reversibility:
+  status: documented
+  grade_basis: >-
+    A reversal path exists and is documented with an operationId, but no vitagroup
+    document states a time window inside which it works, so this grades `documented`
+    rather than `verified`.
+  write_surface: true
+  surfaces:
+  - surface: Contribution rollback (Transaction Compensation)
+    reversal_operation: rollback
+    operation_id: rollback
+    method: POST
+    path: /plugin/transaction-management/ehr/{ehr_id}/contribution/{contribution_id}/rollback
+    spec: openapi/vitagroup-hip-ehrbase-enterprise.yml
+    availability: HIP EHRbase enterprise plugin only, not in the open-source build
+    semantics: >-
+      Rolls back every object in a CONTRIBUTION serially, in inverse order, inside one
+      database transaction, following the Saga pattern. If any object raises a 500 or
+      501 the whole compensation is itself rolled back. On success the contribution
+      row is deleted. Tenant-bound when multi-tenancy is enabled.
+    window_stated: false
+    window: null
+    concurrency: >-
+      ehr_id, contribution_id and status are written before the rollback starts; a
+      second rollback against the same ehr_id blocks until the first finishes or
+      times out.
+    docs: https://docs.ehrbase.org/docs/EHRbase/Enterprise-Features/Transaction-Compensation
+  - surface: Composition
+    reversal_operation: delete (logical)
+    operation_id: deleteComposition
+    method: DELETE
+    path: /rest/openehr/v1/ehr/{ehr_id}/composition/{preceding_version_uid}
+    spec: openapi/vitagroup-hip-ehrbase-openehr.json
+    semantics: >-
+      An openEHR delete is a new version with lifecycle state "deleted", not a row
+      removal. The prior version stays retrievable by version UID and by
+      version_at_time, so a mistaken delete is auditable and the content is
+      recoverable by reading the preceding version. Requires If-Match.
+    window_stated: false
+    window: null
+  - surface: Hard delete (Admin API)
+    reversal_operation: none
+    operation_ids:
+    - deleteEhr
+    - deleteComposition
+    - deleteDirectory
+    - deleteStoredQuery
+    - deleteTemplate
+    - deleteAllTemplates
+    spec: openapi/vitagroup-hip-ehrbase-admin.json
+    semantics: >-
+      The Admin API removes data physically and is explicitly outside the openEHR
+      versioning model. NOT reversible.
+    window_stated: false
+    window: null
+    docs: https://docs.ehrbase.org/docs/EHRbase/Explore/Admin-REST
+  - surface: Merge EHR
+    reversal_operation: none
+    operation_id: mergeEhrs
+    method: POST
+    path: /rest/admin/ehr/merge
+    spec: openapi/vitagroup-hip-ehrbase-admin.json
+    semantics: >-
+      Moves all contributions, compositions and item tags from a source EHR to a
+      target EHR, deletes the source EHR and its EHR_STATUS, and discards the source
+      folders.
+    window_stated: false
+    window: null
+    provider_stated_limitation: >-
+      "Even if unmerging data is stored for each merge, the unmerge operation is not
+      possible at the moment. It might be added in the future." An `unmerge_data`
+      query parameter exists on the merge operation to retain the data needed for a
+      future unmerge, but no unmerge endpoint is published.
+    docs: https://docs.ehrbase.org/docs/EHRbase/Enterprise-Features/Merge-EHR
+  agent_guidance: >-
+    An agent may treat composition and EHR_STATUS writes as recoverable, because the
+    record is versioned and the prior version stays readable. It must treat every
+    /rest/admin/** delete and the merge operation as terminal — there is no published
+    reversal for either, and the provider says so about unmerge in its own docs.
+cross_links:
+  errors: errors/vitagroup-problem-types.yml
+  lifecycle: lifecycle/vitagroup-lifecycle.yml
+  authentication: authentication/vitagroup-authentication.yml
+  rate_limits: rate-limits/vitagroup-rate-limits.yml
+  conformance: conformance/vitagroup-conformance.yml

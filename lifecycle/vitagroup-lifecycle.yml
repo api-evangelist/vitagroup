@@ -1,0 +1,109 @@
+generated: '2026-09-02'
+method: searched
+source: >-
+  https://github.com/ehrbase/ehrbase/blob/develop/UPDATING.md +
+  https://github.com/ehrbase/ehrbase/releases +
+  openapi/vitagroup-hip-ehrbase-admin.json
+versioning:
+  scheme: semver
+  product_version: 2.35.1
+  product_version_date: '2026-08-20'
+  api_version: v1
+  api_version_location: URL path segment (/rest/openehr/v1/...)
+  api_version_changed_since: >-
+    Never. The openEHR REST path version is fixed at v1 by the openEHR ITS-REST
+    specification; behavioural changes ship as server minor versions instead, which is
+    why UPDATING.md rather than a version bump is where breaking changes surface.
+  experimental_namespace:
+    path_prefix: /rest/experimental/
+    meaning: >-
+      Surfaces under this prefix are explicitly unstable. Currently the Item Tag API,
+      whose own spec is titled "EHRbase Item Tag Experimental API".
+    apis:
+    - vitagroup:hip-ehrbase-item-tags
+deprecation_policy:
+  published: true
+  form: migration guide
+  url: https://github.com/ehrbase/ehrbase/blob/develop/UPDATING.md
+  title: Updating EHRbase
+  statement: >-
+    "This file documents any backwards-incompatible changes in EHRbase and assists
+    users migrating to a new version."
+  sunset_header: false
+  deprecation_header: false
+  rfc8594: false
+  advance_notice_period_stated: false
+  note: >-
+    A real, maintained, per-version breaking-change guide — stronger than most
+    providers manage — but it is a document, not a protocol. HIP EHRbase emits no
+    RFC 8594 Sunset or Deprecation response headers, so a running client learns
+    nothing at request time; a human has to read UPDATING.md before upgrading.
+deprecated_operations:
+- operation_id: deleteContribution
+  method: DELETE
+  path: /rest/admin/ehr/{ehr_id}/contribution/{contribution_id}
+  spec: openapi/vitagroup-hip-ehrbase-admin.json
+  state: withdrawn
+  openapi_deprecated_flag: false
+  evidence: >-
+    The operation declares a 501 response described as "Contribution delete is not
+    supported since 2.0.0" and its summary reads "Not supported since 2.0.0".
+  note: >-
+    The operation is still present in the published contract and is NOT marked
+    deprecated:true, so a generated client will expose a method that can only ever
+    fail. Recorded as a contract-hygiene gap rather than a live deprecation.
+  replacement: >-
+    On HIP EHRbase, the enterprise Transaction Compensation rollback operation
+    (operationId `rollback`).
+breaking_changes_recent:
+- version: 2.35.1
+  date: '2026-08-20'
+  summary: >-
+    Data-integrity advisory: folder data and history may have been corrupted since
+    2.30.0 and cannot be automatically corrected.
+- version: 2.30.0
+  date: '2026-03-24'
+  summary: >-
+    Six documented REST response-shape changes (EHR_STATUS and CONTRIBUTION returned as
+    references not objects, empty folder arrays dropped, stored-query list shape
+    changed, DIRECTORY RM validation on by default) plus a full history-table
+    migration.
+  migration_guide: https://github.com/ehrbase/ehrbase/blob/develop/UPDATING.md
+status_page:
+  published: false
+  url: null
+  note: >-
+    No status page exists and none is expected to: HIP EHRbase is deployed on the
+    customer's own infrastructure, so there is no vendor-operated production service
+    whose uptime could be reported. status.vitagroup.ag does not resolve (probed,
+    connection failed). No StatusPage pointer is wired into apis.yml. The runtime
+    equivalent a customer gets is per-instance: GET /rest/status returns build,
+    SDK, Archie, JVM and PostgreSQL versions, and Spring Actuator liveness/readiness
+    and Prometheus endpoints can be enabled under /management.
+  instance_health:
+    status_endpoint: /rest/status
+    admin_status_endpoint: /rest/admin/status
+    actuator_base_path: /management
+    actuator_default: disabled — opt in per endpoint via MANAGEMENT_ENDPOINT_*_ACCESS
+    kubernetes_probes: /management/health/liveness, /management/health/readiness
+    prometheus: /management/prometheus
+    docs: https://docs.ehrbase.org/docs/EHRbase/Explore/Status-And-Metrics
+sla:
+  published: false
+  note: >-
+    The Enterprise Features overview states that HIP EHRbase "offers additional
+    enterprise capabilities along with professional services and service level
+    agreements", but no SLA terms, targets or credits are published — they sit behind
+    the commercial conversation.
+  source: https://docs.ehrbase.org/docs/EHRbase/Enterprise-Features/Overview
+support_lifecycle:
+  published: false
+  note: >-
+    No supported-version window, LTS designation or end-of-life calendar is published
+    for any EHRbase release line.
+gaps:
+- No RFC 8594 Sunset/Deprecation headers, so deprecation is invisible at runtime.
+- deleteContribution is withdrawn in behaviour but not flagged deprecated in the
+  contract.
+- No published version-support window or EOL policy.
+- No SLA terms published despite SLAs being marketed as an enterprise differentiator.

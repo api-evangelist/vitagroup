@@ -1,0 +1,147 @@
+generated: '2026-09-02'
+method: searched
+source: https://repo1.maven.org/maven2/org/ehrbase/ + https://hub.docker.com/r/ehrbase/ehrbase
+note: >-
+  vitagroup's client-side distribution is Java-only. The openEHR SDK
+  (org.ehrbase.openehr.sdk) is the first-party client library for the HIP EHRbase /
+  EHRbase REST surface; the org.ehrbase.openehr coordinates are the server itself,
+  published as libraries so it can be embedded or extended with plugins. Ownership:
+  these coordinates belong to the EHRbase project, whose website ehrbase.org names
+  vitagroup AG as the responsible legal entity in its imprint, and whose enterprise
+  distribution vitagroup sells as HIP EHRbase. No npm, PyPI, NuGet, RubyGems,
+  Packagist, crates.io or pkg.go.dev first-party client exists — those registries were
+  searched and the only hits were third-party community work, recorded under
+  third_party[] and NOT marked official.
+registries_searched:
+- maven-central
+- npm
+- pypi
+- rubygems
+- crates.io
+- nuget
+- pkg.go.dev
+- packagist
+- docker-hub
+packages:
+- name: org.ehrbase.openehr.sdk:client
+  registry: maven-central
+  official: true
+  language: java
+  role: client-sdk
+  url: https://central.sonatype.com/artifact/org.ehrbase.openehr.sdk/client
+  version: 2.35.0
+  published: '2026-08-17'
+  source_repo: https://github.com/ehrbase/openEHR_SDK
+  description: >-
+    openEHR SDK REST client — talks to the openEHR REST API, handles composition
+    serialisation (canonical JSON/XML, flat and structured web-template formats) and
+    AQL query building.
+- name: org.ehrbase.openehr.sdk:bom
+  registry: maven-central
+  official: true
+  language: java
+  role: bill-of-materials
+  url: https://central.sonatype.com/artifact/org.ehrbase.openehr.sdk/bom
+  version: 2.35.0
+  published: '2026-08-17'
+  description: Dependency BOM pinning every openEHR SDK module to one version.
+- name: org.ehrbase.openehr.sdk:generator-maven-plugin
+  registry: maven-central
+  official: true
+  language: java
+  role: codegen
+  url: https://central.sonatype.com/artifact/org.ehrbase.openehr.sdk/generator-maven-plugin
+  version: 2.35.0
+  published: '2026-08-17'
+  description: >-
+    Maven plugin that generates typed Java classes from an openEHR operational
+    template (.opt), so compositions are built against a compiled model rather than
+    hand-assembled JSON.
+- name: org.ehrbase.openehr.sdk:aql
+  registry: maven-central
+  official: true
+  language: java
+  role: library
+  url: https://central.sonatype.com/artifact/org.ehrbase.openehr.sdk/aql
+  version: 2.35.0
+  published: '2026-08-17'
+  description: Archetype Query Language parser and builder.
+- name: org.ehrbase.openehr.sdk:web-template
+  registry: maven-central
+  official: true
+  language: java
+  role: library
+  url: https://central.sonatype.com/artifact/org.ehrbase.openehr.sdk/web-template
+  version: 2.35.0
+  published: '2026-08-17'
+  description: >-
+    Web template / simplified data template handling — the flat and structured JSON
+    formats the openEHR REST API accepts alongside canonical openEHR.
+- name: org.ehrbase.openehr:application
+  registry: maven-central
+  official: true
+  language: java
+  role: server
+  url: https://central.sonatype.com/artifact/org.ehrbase.openehr/application
+  version: 2.35.1
+  published: '2026-08-20'
+  source_repo: https://github.com/ehrbase/ehrbase
+  description: The runnable EHRbase Spring Boot application.
+- name: org.ehrbase.openehr:api
+  registry: maven-central
+  official: true
+  language: java
+  role: plugin-api
+  url: https://central.sonatype.com/artifact/org.ehrbase.openehr/api
+  version: 2.35.1
+  published: '2026-08-20'
+  description: >-
+    The service interfaces an EHRbase plugin compiles against — this is what the HIP
+    enterprise features (Event Trigger, Multi-Tenancy, Transaction Compensation, ATNA)
+    are built on.
+- name: org.ehrbase.openehr:cli
+  registry: maven-central
+  official: true
+  language: java
+  role: cli
+  url: https://central.sonatype.com/artifact/org.ehrbase.openehr/cli
+  version: 2.35.1
+  published: '2026-08-20'
+  description: >-
+    EHRbase command-line module, distributed as a Maven artifact rather than a
+    packaged binary. vitagroup publishes no installation or command reference for it,
+    so no cli/ artifact is claimed on its behalf.
+- name: ehrbase/ehrbase
+  registry: docker-hub
+  official: true
+  role: container-image
+  url: https://hub.docker.com/r/ehrbase/ehrbase
+  version: 2.35.1
+  published: '2026-08-20'
+  tags_available: 114
+  description: >-
+    The published EHRbase server image; this is the distribution the Installation docs
+    use. A floating `latest` tag tracks the current release and a `next` tag tracks
+    development builds.
+third_party:
+- name: n8n-nodes-ehrbase
+  registry: npm
+  official: false
+  version: 1.0.2
+  published: '2026-07-16'
+  publisher: jonakun
+  url: https://www.npmjs.com/package/n8n-nodes-ehrbase
+  note: >-
+    Community n8n integration node for EHRbase. Not published by vitagroup or the
+    EHRbase project and not counted toward first-party SDK coverage.
+currency:
+  assessment: current
+  detail: >-
+    The Java client SDK (2.35.0, 2026-08-17) and the server (2.35.1, 2026-08-20) are
+    released in lockstep and are both within three weeks of this profiling pass, so
+    there is no SDK-behind-API decay signal here.
+gaps:
+- No first-party client library exists for JavaScript/TypeScript, Python, Go, C# or
+  Ruby. Every non-JVM integrator writes raw HTTP against the openEHR REST API.
+- The CLI ships only as a Maven coordinate with no documented install path or command
+  reference.

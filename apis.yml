@@ -1,23 +1,211 @@
 aid: vitagroup
 name: vitagroup
-description: 'vitagroup is a company surfaced via the API Evangelist harvest backlog (source: openehr-coalition)
-  and added to the network as a stub for full-pipeline profiling.'
+description: vitagroup AG is a German health-technology company (Mannheim, HRB 727147)
+  that builds the Health Intelligence Platform (HIP) — an open, vendor-neutral clinical
+  data platform for hospitals, health regions and research institutions. HIP is built
+  on the openEHR standard and its Clinical Data Repository is HIP EHRbase, the commercially
+  supported distribution of EHRbase, the leading open-source openEHR server. vitagroup
+  operates the EHRbase project (ehrbase.org names vitagroup AG as the responsible entity),
+  publishes the openEHR REST, Admin, Item Tag and HIP Enterprise OpenAPI definitions
+  at docs.ehrbase.org, and runs a public unauthenticated sandbox instance at sandkiste.ehrbase.org.
+  FHIR and HL7v2 interoperability is provided through the CDR Bridge / FHIR Bridge and
+  the openFHIR and FHIRconnect projects.
+image: https://www.vitagroup.ag/wp-content/uploads/2023/09/vitagroup_Vorschau_berry_4zu3-1024x819.png
 url: https://raw.githubusercontent.com/api-evangelist/vitagroup/refs/heads/main/apis.yml
 x-type: company
 x-source: harvest:openehr-coalition
-x-tier: stub
-x-tier-reason: harvest
 specificationVersion: '0.20'
 created: '2026-09-02'
 modified: '2026-09-02'
 tags:
 - Company
-apis: []
+- Healthcare
+- Health IT
+- Electronic Health Records
+- openEHR
+- FHIR
+- Clinical Data Repository
+- Interoperability
+- Germany
+- Open Source
 maintainers:
 - FN: Kin Lane
   email: kin@apievangelist.com
 - FN: APIs.json
   email: info@apis.io
+apis:
+- aid: vitagroup:hip-ehrbase-openehr
+  name: HIP EHRbase openEHR REST API
+  description: EHRbase's implementation of the official openEHR REST API (ITS-REST)
+    — EHR, EHR_STATUS, COMPOSITION, DIRECTORY, CONTRIBUTION, versioned objects, ADL
+    1.4 / ADL 2 template definitions and Archetype Query Language (AQL) execution,
+    plus the EHRbase status heartbeat. 31 paths / 45 operations.
+  humanURL: https://docs.ehrbase.org/api/hip-ehrbase/openehr
+  baseURL: https://sandkiste.ehrbase.org/ehrbase
+  tags:
+  - openEHR
+  - Electronic Health Records
+  - Clinical Data Repository
+  - AQL
+  properties:
+  - type: OpenAPI
+    url: openapi/vitagroup-hip-ehrbase-openehr.json
+  - type: Documentation
+    url: https://docs.ehrbase.org/docs/EHRbase/Explore/openEHR-REST
+  - type: Overlay
+    url: overlays/vitagroup-hip-ehrbase-openehr-overlay.yaml
+- aid: vitagroup:hip-ehrbase-admin
+  name: HIP EHRbase Admin API
+  description: EHRbase's non-standard administrative API — hard delete and update of
+    EHRs, compositions, contributions, directories, stored queries and templates, plus
+    the HIP EHRbase Merge EHR operations (merge, merge status, merge details, merge
+    target). 8 paths / 11 operations, admin role required.
+  humanURL: https://docs.ehrbase.org/api/hip-ehrbase/admin
+  baseURL: https://sandkiste.ehrbase.org/ehrbase
+  tags:
+  - openEHR
+  - Administration
+  - Electronic Health Records
+  properties:
+  - type: OpenAPI
+    url: openapi/vitagroup-hip-ehrbase-admin.json
+  - type: Documentation
+    url: https://docs.ehrbase.org/docs/EHRbase/Explore/Admin-REST
+  - type: Overlay
+    url: overlays/vitagroup-hip-ehrbase-admin-overlay.yaml
+- aid: vitagroup:hip-ehrbase-item-tags
+  name: HIP EHRbase Item Tag Experimental API
+  description: Experimental EHRbase API for attaching, reading and deleting ITEM_TAG
+    key/value annotations on EHR_STATUS and COMPOSITION versioned objects, addressed
+    by openEHR path. 2 paths / 6 operations. Marked experimental by the provider.
+  humanURL: https://docs.ehrbase.org/api/hip-ehrbase/tags
+  baseURL: https://sandkiste.ehrbase.org/ehrbase
+  tags:
+  - openEHR
+  - Tagging
+  - Experimental
+  properties:
+  - type: OpenAPI
+    url: openapi/vitagroup-hip-ehrbase-item-tags.json
+  - type: Documentation
+    url: https://docs.ehrbase.org/docs/EHRbase/Explore/Item-Tags
+  - type: Overlay
+    url: overlays/vitagroup-hip-ehrbase-item-tags-overlay.yaml
+- aid: vitagroup:hip-ehrbase-enterprise
+  name: HIP EHRbase Enterprise API
+  description: The closed-source HIP EHRbase enterprise plugin API — Event Trigger
+    management (AQL-defined hooks that forward composition and EHR_STATUS events over
+    HTTP, AMQP/RabbitMQ or Kafka), Multi-tenant provisioning, and Transaction Compensation
+    (Saga-pattern contribution rollback). 6 paths / 9 operations, bearer JWT required.
+  humanURL: https://docs.ehrbase.org/api/hip-ehrbase/enterprise
+  baseURL: https://{ehrbaseBaseUrl}
+  tags:
+  - openEHR
+  - Events
+  - Multi-Tenancy
+  - Enterprise
+  properties:
+  - type: OpenAPI
+    url: openapi/vitagroup-hip-ehrbase-enterprise.yml
+  - type: Documentation
+    url: https://docs.ehrbase.org/docs/EHRbase/Enterprise-Features/Overview
+  - type: Webhooks
+    url: asyncapi/vitagroup-event-trigger-webhooks.yml
+  - type: Overlay
+    url: overlays/vitagroup-hip-ehrbase-enterprise-overlay.yaml
+- aid: vitagroup:ehrbase-sandbox-live
+  name: EHRbase Sandbox (live springdoc api-docs)
+  description: The OpenAPI document served by vitagroup's public EHRbase sandbox instance
+    at sandkiste.ehrbase.org, harvested from /ehrbase/v3/api-docs. Combines the openEHR,
+    EHR-Scape (ECIS), Admin and Status surfaces of the running server — 44 paths /
+    63 operations — and is the only vitagroup-published spec that carries a real, resolvable
+    servers[] host rather than the generated localhost placeholder.
+  humanURL: https://sandkiste.ehrbase.org/ehrbase/swagger-ui/index.html
+  baseURL: https://sandkiste.ehrbase.org/ehrbase
+  tags:
+  - openEHR
+  - Sandbox
+  - Electronic Health Records
+  properties:
+  - type: OpenAPI
+    url: openapi/vitagroup-ehrbase-sandbox-live.json
+  - type: Sandbox
+    url: sandbox/vitagroup-sandbox.yml
 common:
 - type: Website
   url: https://www.vitagroup.ag/
+- type: DeveloperPortal
+  url: https://docs.ehrbase.org/
+- type: Documentation
+  url: https://docs.ehrbase.org/docs/EHRbase/openEHR-Introduction/Introduction
+- type: APIReference
+  url: https://docs.ehrbase.org/api/hip-ehrbase/openehr
+- type: GettingStarted
+  url: https://docs.ehrbase.org/docs/EHRbase/Installation
+- type: Sandbox
+  url: https://sandkiste.ehrbase.org/
+- type: GitHubOrganization
+  url: https://github.com/vitagroupag
+- type: SourceCode
+  url: https://github.com/ehrbase/ehrbase
+- type: Support
+  url: https://hip.vitagroup.ag/en/contact/
+- type: Blog
+  url: https://hip.vitagroup.ag/en/tech-blog/
+- type: BlogRSS
+  url: https://hip.vitagroup.ag/en/feed/
+- type: PrivacyPolicy
+  url: https://www.vitagroup.ag/en/privacy/
+- type: Imprint
+  url: https://www.vitagroup.ag/en/imprint/
+- type: SignUp
+  url: https://hip.vitagroup.ag/en/contact/
+- type: LinkedIn
+  url: https://www.linkedin.com/company/vitagroup-ag/
+- type: Packages
+  url: packages/vitagroup-packages.yml
+- type: SDKs
+  url: packages/vitagroup-packages.yml
+- type: Authentication
+  url: authentication/vitagroup-authentication.yml
+- type: OAuthScopes
+  url: scopes/vitagroup-scopes.yml
+- type: Conventions
+  url: conventions/vitagroup-conventions.yml
+- type: ErrorCatalog
+  url: errors/vitagroup-problem-types.yml
+- type: Lifecycle
+  url: lifecycle/vitagroup-lifecycle.yml
+- type: Deprecation
+  url: lifecycle/vitagroup-lifecycle.yml
+- type: ChangeLog
+  url: changelog/vitagroup-changelog.yml
+- type: Conformance
+  url: conformance/vitagroup-conformance.yml
+- type: DataModel
+  url: data-model/vitagroup-data-model.yml
+- type: Webhooks
+  url: asyncapi/vitagroup-event-trigger-webhooks.yml
+- type: AgentSkill
+  url: skills/_index.yml
+- type: LLMsTxt
+  url: llms/vitagroup-llms.txt
+- type: MCPServer
+  url: mcp/vitagroup-mcp.yml
+- type: Plans
+  url: plans/vitagroup-plans-pricing.yml
+- type: RateLimits
+  url: rate-limits/vitagroup-rate-limits.yml
+- type: DomainSecurity
+  url: security/vitagroup-domain-security.yml
+- type: Security
+  url: security/vitagroup-vulnerability-disclosure.yml
+- type: VulnerabilityDisclosure
+  url: security/vitagroup-vulnerability-disclosure.yml
+- type: Overlay
+  url: overlays/vitagroup-hip-ehrbase-openehr-overlay.yaml
+x-enrichment:
+  date: '2026-09-02'
+  status: enriched
+  artifacts_added: 31
+  pass: local-v1

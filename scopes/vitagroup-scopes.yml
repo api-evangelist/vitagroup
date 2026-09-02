@@ -1,0 +1,54 @@
+generated: '2026-09-02'
+method: searched
+source: https://docs.ehrbase.org/docs/EHRbase/Explore/Security
+docs: https://docs.ehrbase.org/docs/EHRbase/Explore/Security
+note: >-
+  derive-oauth-scopes.py returned zero scopes because none of vitagroup's published
+  OpenAPI documents declare an oauth2 securityScheme — the enterprise spec declares
+  only http/bearer. OAuth 2.0 IS documented, but EHRbase does not model authorization
+  as a scope catalogue. It reads a single role value out of the JWT's realm_access.roles
+  or scope claim and maps it to one of two authorization levels. The role NAMES are
+  operator-configurable, so what is recorded below is the vendor default and the claim
+  path, not a fixed scope vocabulary.
+model: role-in-claim
+scope_count: 0
+roles:
+- name: USER
+  claim_paths:
+  - realm_access.roles
+  - scope
+  configurable_via_env: SECURITY_OAUTH2USERROLE
+  configurable_via_property: security.oauth2UserRole
+  default: USER
+  grants: >-
+    The openEHR REST API surface — EHR, EHR_STATUS, COMPOSITION, DIRECTORY,
+    CONTRIBUTION, versioned objects, template definitions and AQL query execution.
+  source: https://docs.ehrbase.org/docs/EHRbase/Explore/Security
+- name: ADMIN
+  claim_paths:
+  - realm_access.roles
+  - scope
+  configurable_via_env: SECURITY_OAUTH2ADMINROLE
+  configurable_via_property: security.oauth2AdminRole
+  default: ADMIN
+  grants: >-
+    Everything USER grants, plus the Admin API under /rest/admin/** (hard delete and
+    update of EHRs, compositions, contributions, directories, stored queries and
+    templates; Merge EHR) and, under the default ADMIN_ONLY management access policy,
+    the Spring Actuator management endpoints.
+  source: https://docs.ehrbase.org/docs/EHRbase/Explore/Admin-REST
+authorization_server:
+  vendor_hosted: false
+  note: >-
+    The issuer is supplied by the operator via
+    SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUERURI. In the HIP platform this is
+    Keycloak, with one realm per tenant. vitagroup publishes no
+    /.well-known/openid-configuration of its own — probed and 404 on every vitagroup
+    and ehrbase host (see well-known/vitagroup-well-known.yml).
+  example_issuer_default: http://localhost:8081/auth/realms/ehrbase
+gaps:
+- No per-operation or per-resource scope vocabulary exists; authorization is coarse,
+  two-level (user / admin), so an agent cannot request least privilege beyond
+  "not admin".
+- Because role names are deployment-configurable, a client cannot learn the correct
+  role value from any vitagroup-published contract.

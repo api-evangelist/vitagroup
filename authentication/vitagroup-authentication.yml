@@ -1,0 +1,121 @@
+generated: '2026-09-02'
+method: searched
+source: https://docs.ehrbase.org/docs/EHRbase/Explore/Security
+docs: https://docs.ehrbase.org/docs/EHRbase/Explore/Security
+note: >-
+  HIP EHRbase is customer-deployed software, so the authentication mechanism is chosen
+  by the operator at boot rather than fixed by the vendor. The published OpenAPI documents
+  therefore declare almost no securitySchemes (only the enterprise plugin spec declares
+  bearerAuth); the real auth contract is documented in prose on the EHRbase Security
+  page and is captured here. Derived scheme detail from the spec is preserved under
+  spec_declared[].
+summary:
+  types:
+  - none
+  - http
+  - oauth2
+  default_mode: none
+  selected_by: operator at startup via SECURITY_AUTHTYPE / security.authType
+modes:
+- id: NONE
+  value: NONE
+  type: none
+  default: true
+  description: >-
+    EHRbase starts with security disabled by default and reports this in a boot message.
+    All resources are reachable unauthenticated. This is the mode the public sandbox
+    at sandkiste.ehrbase.org runs in.
+  source: https://docs.ehrbase.org/docs/EHRbase/Explore/Security
+- id: BASIC
+  value: BASIC
+  type: http
+  scheme: basic
+  description: >-
+    A predefined set of users and roles configured at startup. Clients send
+    Authorization: Basic {base64(username:password)}.
+  configuration:
+  - env: SECURITY_AUTHTYPE
+    property: security.authType
+    value: BASIC
+  - env: SECURITY_AUTHUSER
+    property: security.authUser
+    default: ehrbase-user
+  - env: SECURITY_AUTHPASSWORD
+    property: security.authPassword
+    note: vendor default is a placeholder and must be replaced
+  - env: SECURITY_AUTHADMINUSER
+    property: security.authAdminUser
+    default: ehrbase-admin
+  - env: SECURITY_AUTHADMINPASSWORD
+    property: security.authAdminPassword
+    note: vendor default is a placeholder and must be replaced
+  source: https://docs.ehrbase.org/docs/EHRbase/Explore/Security
+- id: OAUTH
+  value: OAUTH
+  type: oauth2
+  subtype: bearer JWT / OAuth 2.0 resource server
+  description: >-
+    EHRbase acts as an OAuth 2.0 resource server against an external authorization
+    server realm (Keycloak in the HIP platform). It validates the JWT and reads the
+    role claim to decide user vs admin access.
+  token_location: Authorization header, Bearer scheme
+  claims_read:
+  - realm_access.roles
+  - scope
+  configuration:
+  - env: SECURITY_AUTHTYPE
+    property: security.authType
+    value: OAUTH
+  - env: SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUERURI
+    property: spring.security.oauth2.resourceserver.jwt.issuer-uri
+    description: base URL of the external authorization server realm
+    default: http://localhost:8081/auth/realms/ehrbase
+  - env: SECURITY_OAUTH2USERROLE
+    property: security.oauth2UserRole
+    default: USER
+  - env: SECURITY_OAUTH2ADMINROLE
+    property: security.oauth2AdminRole
+    default: ADMIN
+  source: https://docs.ehrbase.org/docs/EHRbase/Explore/Security
+spec_declared:
+- name: bearerAuth
+  type: http
+  scheme: bearer
+  applies_to: HIP EHRbase Enterprise API (all operations)
+  sources:
+  - openapi/vitagroup-hip-ehrbase-enterprise.yml
+roles:
+- name: user
+  configurable_via: SECURITY_OAUTH2USERROLE
+  default: USER
+  grants: the standard openEHR REST surface
+- name: admin
+  configurable_via: SECURITY_OAUTH2ADMINROLE
+  default: ADMIN
+  grants: >-
+    the Admin API (/rest/admin/**), the Merge EHR operations, and by default the
+    Spring Actuator management endpoints
+management_endpoint_access:
+  property: management.endpoints.web.access
+  values:
+  - ADMIN_ONLY
+  - PRIVATE
+  - PUBLIC
+  default: ADMIN_ONLY
+  csrf: >-
+    Write access to management endpoints is CSRF-protected by default; disable with
+    ehrbase.security.management.endpoints.web.csrf-validation-enabled=false
+  source: https://docs.ehrbase.org/docs/EHRbase/Explore/Status-And-Metrics
+multi_tenancy:
+  supported: true
+  mechanism: >-
+    Tenants map to Keycloak realms; data is logically separated with a dedicated
+    database schema per tenant. The enterprise Multi-tenant plugin API requires a
+    tenant user bearer token.
+  source: https://docs.ehrbase.org/docs/EHRbase/Enterprise-Features/Multi-Tenancy
+gaps:
+- The three open-source OpenAPI documents (openEHR, Admin, Item Tags) declare no
+  securitySchemes at all, so a generated client cannot tell from the contract that
+  Basic or Bearer auth may be required.
+- No OpenID Connect discovery document is published by vitagroup; the issuer is
+  operator-supplied per deployment.

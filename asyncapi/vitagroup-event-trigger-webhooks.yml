@@ -1,0 +1,168 @@
+generated: '2026-09-02'
+method: searched
+source: https://docs.ehrbase.org/docs/EHRbase/Enterprise-Features/Event-Trigger
+spec_type: Webhooks
+asyncapi_published: false
+note: >-
+  HIP EHRbase has a genuine event surface, but vitagroup publishes NO AsyncAPI document
+  for it — /asyncapi.yaml, /asyncapi.json and /events were probed on every vitagroup
+  and ehrbase host with no hit, and there is no event catalogue page. What follows is
+  the webhook/event catalogue read out of the Event Trigger documentation and the
+  enterprise OpenAPI, with no shape invented. It is unusual in that the provider does
+  not define a fixed set of event types: the OPERATOR defines them, in AQL, at runtime.
+surface:
+  name: Event Trigger
+  availability: HIP EHRbase enterprise plugin (not in the open-source build)
+  enabled_by: 'event-trigger.enabled / EVENT_TRIGGER_ENABLED: true'
+  model: >-
+    Rather than a fixed catalogue of vendor-defined events with fixed payloads, an
+    operator registers a trigger whose `when` clause is an AQL query and whose `then`
+    clause is a list of notify/log actions. The trigger fires on composition or
+    EHR_STATUS lifecycle events and forwards the AQL projection to the configured
+    channel. The payload shape is therefore determined by the AQL SELECT, not by
+    vitagroup.
+  management_api:
+    spec: openapi/vitagroup-hip-ehrbase-enterprise.yml
+    operations:
+    - operation_id: getAll
+      method: GET
+      path: /plugin/event-trigger/service/
+      summary: Get All Event Triggers
+    - operation_id: store
+      method: POST
+      path: /plugin/event-trigger/service/
+      summary: Create Event Trigger
+    - operation_id: getBy
+      method: GET
+      path: /plugin/event-trigger/service/{id}
+      summary: Get Event Trigger By Trigger-Id Or Trigger-UUID
+    - operation_id: activate
+      method: PUT
+      path: /plugin/event-trigger/service/{uuid}
+      summary: Activate Event Trigger
+    - operation_id: deleteBy
+      method: DELETE
+      path: /plugin/event-trigger/service/{id}
+      summary: Delete Event Trigger By Trigger-UUID
+transports:
+- id: http
+  name: HTTP webhook
+  enabled_by: event-trigger.http.activate
+  auth_supported:
+  - none
+  - http-basic
+  - oauth2-bearer (client_credentials against a configured issuer)
+  tls:
+    setting: event-trigger.http.sslEnforce
+    effect: rewrites any configured trigger URL to https
+    mutual_tls: >-
+      Documented as enforcing mutual authentication between client and server when
+      SSL/TLS is enabled for HTTP event triggers.
+  endpoint_allowlist:
+    setting: event-trigger.http.provider
+    detail: >-
+      Receiving endpoints are pre-registered by name with a URL, credentials and a
+      request-timeout. A trigger naming no configured provider raises an exception
+      unless event-trigger.http.allowWildcardProviders is true.
+- id: amqp
+  name: AMQP / RabbitMQ
+  enabled_by: event-trigger.amqp.activate
+  settings:
+  - event-trigger.amqp.host
+  - event-trigger.amqp.port
+  - event-trigger.amqp.username
+  - event-trigger.amqp.password
+  - event-trigger.amqp.virtual-host
+  addressing: publish command with exchange + routing-key
+- id: kafka
+  name: Apache Kafka
+  enabled_by: eventTrigger.kafka.activate
+  settings:
+  - spring.kafka.bootstrap-servers
+- id: logger
+  name: Java logging
+  detail: notify command with channel "logger" — local log sink, not a network transport
+trigger_definition:
+  schema_source: >-
+    The EventTrigger schema is a real component in
+    openapi/vitagroup-hip-ehrbase-enterprise.yml, and two complete worked examples are
+    published in the Event Trigger docs.
+  fields:
+    id: operator-chosen trigger identifier
+    state: active | (inactive)
+    author: openEHR-style author block (date, name, email, organisation)
+    definition.mode:
+      values:
+      - BEFORE
+      - AFTER
+      meaning: fire before or after the internal database transaction completes
+    definition.data_type:
+      values:
+      - COMPOSITION
+      - EHR_STATUS
+    definition.event_type:
+      values_observed:
+      - CREATE
+      - UPDATE
+      - DELETE
+      - HARD_DELETE
+      note: >-
+        HARD_DELETE appears in the published EHR_STATUS example; DELETE appears in the
+        COMPOSITION example. The docs do not state which values are valid for which
+        data_type, so no cross-product is asserted here.
+    definition.rules[].when.aql: the AQL query that selects the payload
+    definition.rules[].then[]:
+      notify:
+        command: publish
+        channel: amqp | http | kafka
+        exchange: AMQP exchange
+        routing-key: AMQP routing key
+      log:
+        command: notify
+        channel: logger
+    definition.pre_condition: list, empty in both published examples
+event_catalogue:
+  vendor_defined_events: 0
+  operator_defined: true
+  matrix:
+  - data_type: COMPOSITION
+    event_types:
+    - CREATE
+    - UPDATE
+    - DELETE
+    hook_point: composition creation/update, before or after the DB transaction
+  - data_type: EHR_STATUS
+    event_types:
+    - CREATE
+    - UPDATE
+    - HARD_DELETE
+also_emitted_by:
+  merge_ehr: >-
+    "the merge operation is covered by event triggers and ATNA logging" —
+    https://docs.ehrbase.org/docs/EHRbase/Enterprise-Features/Merge-EHR
+tenancy:
+  tenant_bound: true
+  detail: When multi-tenancy is enabled, event triggers are tenant-bound.
+delivery_semantics:
+  retries: not documented
+  ordering: not documented
+  at_least_once_or_at_most_once: not documented
+  signing: >-
+    No payload signature scheme (no HMAC header). Receiver authenticity is handled the
+    other way round — EHRbase authenticates ITSELF to the receiver with Basic or OAuth2
+    — so a receiver cannot verify a delivery came from EHRbase except by mutual TLS.
+  concurrency:
+    setting: eventTrigger.workers
+    detail: executor pool size; multiple triggers are evaluated in parallel
+  timeout:
+    setting: request-timeout per configured HTTP provider
+    example: 30S
+gaps:
+- No AsyncAPI document, so the event surface cannot be code-generated or validated.
+- No delivery guarantee, retry policy, ordering guarantee or dead-letter behaviour is
+  documented.
+- No webhook payload signing, so a receiver cannot verify origin without mutual TLS.
+- Payload shape is defined by the operator's AQL, which makes the surface flexible but
+  means no consumer contract exists to publish.
+- The published Event Trigger config example embeds placeholder Basic credentials in
+  plain text.

@@ -1,0 +1,116 @@
+generated: '2026-09-02'
+method: generated
+source: openapi/vitagroup-hip-ehrbase-openehr.json
+overlay: 1.0.0
+info:
+  title: API Evangelist enhancements — HIP EHRbase openEHR REST API
+  version: 1.0.0
+extends: ../openapi/vitagroup-hip-ehrbase-openehr.json
+x-note: >-
+  Non-destructive enhancements only. The upstream document is stored verbatim and is
+  never mutated. The single most consequential action here is replacing the generated
+  localhost servers[] entry — springdoc emits http://localhost:8080/ehrbase because the
+  spec is generated from a running dev instance, which makes the published contract
+  unusable as-is. The real, probed, vitagroup-operated host is substituted and the
+  self-hosted deployment reality is recorded as a variable.
+actions:
+- target: $.info
+  description: Record provenance and the ownership justification.
+  update:
+    x-provider: vitagroup AG
+    x-provider-slug: vitagroup
+    x-ownership-justification: >-
+      The contract is served from vitagroup's own documentation repository
+      (github.com/vitagroupag/documentation, api/ehrbase-openehr.json) and rendered at
+      docs.ehrbase.org under the route /api/hip-ehrbase/openehr. The docs site's own
+      configuration names organizationName "vitagroup", and the imprint of ehrbase.org
+      names vitagroup AG (Mannheim, HRB 727147) as the responsible legal entity. HIP
+      EHRbase is vitagroup's commercial distribution of this server.
+    x-apis-io-slug: vitagroup
+    contact:
+      name: vitagroup AG
+      url: https://hip.vitagroup.ag/en/contact/
+- target: $.servers
+  description: >-
+    Replace the springdoc-generated localhost placeholder with the real host, retaining
+    a templated form for the customer-hosted case.
+  update:
+  - url: https://sandkiste.ehrbase.org/ehrbase
+    description: >-
+      vitagroup's public EHRbase sandbox — live, unauthenticated (AUTH_TYPE=NONE),
+      probed 200 on 2026-09-02.
+  - url: https://{host}/{basePath}
+    description: >-
+      A customer-operated HIP EHRbase deployment. HIP EHRbase is installed on the
+      customer's own infrastructure, so there is no single vendor production host.
+    variables:
+      host:
+        default: hip-ehrbase.example.org
+        description: The hostname of your HIP EHRbase deployment.
+      basePath:
+        default: ehrbase
+        description: Servlet context path; "ehrbase" is the default in the published container image.
+- target: $.info
+  description: Declare the domain standard the contract implements.
+  update:
+    x-domain-standard:
+      id: openehr-its-rest
+      name: openEHR REST API (ITS-REST)
+      body: openEHR International
+      url: https://specifications.openehr.org/releases/ITS-REST/latest/
+      evidence: info.description, path namespace /rest/openehr/v1, openEHR-* request headers
+- target: $
+  description: >-
+    Record the runtime semantics that are documented in prose but absent from the
+    contract.
+  update:
+    x-conventions:
+      concurrency:
+        header: If-Match
+        failure_status: 412
+        note: ETag on the 412 response carries the current version_uid.
+      representation_control:
+        header: Prefer
+        values: [return=minimal, return=representation]
+      audit:
+        header: openEHR-AUDIT_DETAILS
+      point_in_time:
+        parameter: version_at_time
+      idempotency:
+        supported: false
+      rate_limits:
+        published: false
+      errors:
+        rfc9457: false
+- target: $
+  description: >-
+    Record the authentication modes the contract omits. The published document declares
+    NO securitySchemes at all, even though the same server can be started requiring
+    HTTP Basic or an OAuth 2.0 bearer JWT.
+  update:
+    x-authentication:
+      declared_in_spec: false
+      modes: [NONE, BASIC, OAUTH]
+      default: NONE
+      selected_by: operator at startup via SECURITY_AUTHTYPE
+      docs: https://docs.ehrbase.org/docs/EHRbase/Explore/Security
+      artifact: authentication/vitagroup-authentication.yml
+- target: $.tags
+  description: Add a tag set — the upstream document declares none, so every operation is untagged.
+  update:
+  - name: EHR
+    description: Electronic health record containers and their status.
+  - name: Composition
+    description: Clinical documents committed against an operational template.
+  - name: Directory
+    description: Folder organisation of compositions within an EHR.
+  - name: Contribution
+    description: Transactional change sets and their audit details.
+  - name: Versioned Objects
+    description: Revision history and point-in-time retrieval.
+  - name: Template Definition
+    description: ADL 1.4 and ADL 2 operational templates and their projections.
+  - name: Query
+    description: Ad-hoc and stored Archetype Query Language execution.
+  - name: Status
+    description: Server heartbeat and build information.

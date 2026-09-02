@@ -1,0 +1,147 @@
+generated: '2026-09-02'
+method: derived
+source: openapi/vitagroup-hip-ehrbase-openehr.json
+status: candidate
+note: >-
+  vitagroup publishes NO MCP server. Searched the vitagroupag and ehrbase GitHub orgs
+  (13 and 22 repositories respectively — no MCP repo), npm (only a third-party n8n
+  node), the docs site, hip.vitagroup.ag and the web. No hosted endpoint, no stdio
+  package, no /.well-known/oauth-protected-resource. The tools below are a CANDIDATE
+  set derived from real operationIds in the published openEHR OpenAPI so the shape of
+  a server is on record; no endpoint has been invented and none of this is claimed to
+  exist.
+deployment:
+  mode: none
+  endpoint: null
+  install: null
+  package: null
+  auth: unknown
+  verified: searched
+search_evidence:
+- surface: https://github.com/orgs/vitagroupag/repositories
+  result: 13 repos, none MCP-related
+- surface: https://github.com/orgs/ehrbase/repositories
+  result: 22 repos, none MCP-related
+- surface: https://registry.npmjs.org search "ehrbase"
+  result: one third-party package (n8n-nodes-ehrbase), no MCP server
+- surface: https://docs.ehrbase.org/sitemap.xml
+  result: 54 URLs, no MCP page
+- surface: /.well-known/oauth-protected-resource on all four hosts
+  result: 404 / SPA redirect
+candidate_tools:
+- name: create_ehr
+  rest:
+  - createEhr
+  - createEhrWithId
+  description: Create a new electronic health record, optionally at a caller-chosen UUID.
+  write: true
+- name: find_ehr_by_subject
+  rest:
+  - getEhrBySubject
+  description: Resolve an EHR by subject id and namespace before creating a duplicate.
+  write: false
+- name: get_ehr
+  rest:
+  - getEhrById
+  description: Read an EHR summary by ehr_id.
+  write: false
+- name: get_ehr_status
+  rest:
+  - getEhrStatusVersionByTime
+  - getEhrStatusByVersionId
+  description: Read the EHR_STATUS at a version or at an instant.
+  write: false
+- name: update_ehr_status
+  rest:
+  - updateEhrStatus
+  description: Update EHR_STATUS. Requires If-Match with the preceding version_uid.
+  write: true
+- name: list_templates
+  rest:
+  - getTemplatesClassic
+  - getTemplatesNew
+  description: List the ADL 1.4 and ADL 2 operational templates loaded on the server.
+  write: false
+- name: get_web_template
+  rest:
+  - getWebTemplate
+  - getTemplateExample
+  description: >-
+    Fetch the simplified web-template projection of an operational template, or a
+    generated valid example instance — the two things an agent needs before it can
+    compose a valid clinical document.
+  write: false
+- name: create_composition
+  rest:
+  - createComposition
+  description: Commit a clinical composition against a template. Not idempotent.
+  write: true
+- name: get_composition
+  rest:
+  - getComposition
+  description: Read a composition by versioned object uid, optionally at an instant.
+  write: false
+- name: update_composition
+  rest:
+  - updateComposition
+  description: Update a composition. Requires If-Match; 412 on a stale version.
+  write: true
+- name: delete_composition
+  rest:
+  - deleteComposition
+  description: >-
+    Logically delete a composition (creates a deleted version; prior versions stay
+    readable). Requires If-Match.
+  write: true
+- name: run_aql_query
+  rest:
+  - executeAdHocQuery
+  - executeAdHocQuery_1
+  description: >-
+    Execute an ad-hoc Archetype Query Language query with offset/fetch paging. The
+    highest-value read tool — one query language spans the whole record.
+  write: false
+- name: run_stored_query
+  rest:
+  - executeStoredQuery
+  - executeStoredQuery_1
+  - executeStoredQuery_2
+  - executeStoredQuery_3
+  description: Execute a stored AQL query by qualified name and version.
+  write: false
+- name: list_stored_queries
+  rest:
+  - getStoredQueryList
+  - getStoredQueryList_1
+  - getStoredQueryVersion
+  description: Discover the AQL queries already registered on the server.
+  write: false
+- name: get_composition_history
+  rest:
+  - retrieveVersionedCompositionByVersionedObjectUid
+  - retrieveVersionedCompositionRevisionHistoryByEhr
+  - retrieveVersionOfCompositionByTime
+  description: Walk the revision history of a versioned composition.
+  write: false
+- name: get_server_status
+  rest:
+  - getEhrbaseStatus
+  description: Read the EHRbase build, SDK, Archie, JVM and database versions.
+  write: false
+candidate_tool_count: 16
+derivation:
+  backing_operations: 30
+  spec: openapi/vitagroup-hip-ehrbase-openehr.json
+  excluded:
+    admin_api: >-
+      The Admin API is deliberately excluded from the candidate set — every one of its
+      operations is a physical, irreversible delete or a merge with no unmerge. See
+      conventions/vitagroup-conventions.yml#reversibility.
+    enterprise_api: >-
+      Excluded because it is closed-source and deployment-specific.
+agent_readiness_note: >-
+  If vitagroup ever ships a server, the two tools that matter most are get_web_template
+  and run_aql_query: an agent cannot compose a valid openEHR document without the
+  template projection, and cannot find anything without AQL. The write path needs the
+  If-Match round trip modelled explicitly, because a naive agent will strip the
+  precondition when it hits its first 412.

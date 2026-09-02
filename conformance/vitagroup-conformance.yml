@@ -1,0 +1,220 @@
+generated: '2026-09-02'
+method: derived
+source: >-
+  openapi/vitagroup-hip-ehrbase-openehr.json,
+  openapi/vitagroup-hip-ehrbase-admin.json,
+  openapi/vitagroup-hip-ehrbase-enterprise.yml,
+  https://docs.ehrbase.org/docs/EHRbase/Explore/Security,
+  https://docs.ehrbase.org/docs/EHRbase/Enterprise-Features/ATNA
+note: >-
+  Every assertion below cites a location in a published vitagroup contract or a
+  vitagroup-published document. Nothing is asserted from marketing copy. Standards the
+  provider does not implement are recorded with conforms:false rather than omitted,
+  because the absence is the finding for several of them.
+domain_standard:
+  id: openehr-its-rest
+  name: openEHR REST API (ITS-REST)
+  body: openEHR International
+  conforms: true
+  primary: true
+  evidence:
+    contract_locations:
+    - spec: openapi/vitagroup-hip-ehrbase-openehr.json
+      location: info.description
+      quote: >-
+        "EHRbase implements the official openEHR REST API
+        (https://specifications.openehr.org/releases/ITS-REST/latest/)."
+    - spec: openapi/vitagroup-hip-ehrbase-openehr.json
+      location: paths
+      detail: >-
+        31 paths under the standard's own namespace /rest/openehr/v1/ — ehr,
+        ehr/{ehr_id}/ehr_status, .../composition, .../directory, .../contribution,
+        .../versioned_ehr_status, .../versioned_composition, definition/template/adl1.4,
+        definition/template/adl2, definition/query, query/aql.
+    - spec: openapi/vitagroup-hip-ehrbase-openehr.json
+      location: parameters[in=header]
+      detail: >-
+        The standard's own request headers are declared as first-class parameters —
+        openEHR-VERSION on 21 operations, openEHR-AUDIT_DETAILS on 22, Prefer on 12,
+        If-Match on 4.
+    - spec: openapi/vitagroup-hip-ehrbase-openehr.json
+      location: responses content media types
+      detail: >-
+        openEHR-registered media types are served —
+        application/openehr.wt+json, application/openehr.wt.flat.schema+json,
+        application/openehr.wt.structured.schema+json — alongside canonical
+        application/json and application/xml.
+    - probe: https://sandkiste.ehrbase.org/ehrbase/v3/api-docs
+      status: 200
+      detail: >-
+        The running instance serves the same /rest/openehr/v1 path set, so this is an
+        implemented surface and not a paper conformance claim.
+  buyer_impact: >-
+    An integrator that already speaks openEHR ITS-REST calls HIP EHRbase with no
+    bespoke connector. That is the whole commercial proposition of the product.
+conformance:
+- id: openehr-rm
+  name: openEHR Reference Model
+  conforms: true
+  evidence:
+    detail: >-
+      The 67 component schemas in the openEHR spec are the openEHR RM classes —
+      COMPOSITION, EHR_STATUS, CONTRIBUTION, FOLDER, ORIGINAL_VERSION, VERSIONED_OBJECT,
+      DV_* data types. Release 2.30.0 added RM constraint validation for DIRECTORY.
+    spec: openapi/vitagroup-hip-ehrbase-openehr.json
+    runtime: 'GET /rest/status reports archie_version: 3.13.0 — the Archie openEHR RM library'
+- id: openehr-aql
+  name: Archetype Query Language
+  conforms: true
+  evidence:
+    spec: openapi/vitagroup-hip-ehrbase-openehr.json
+    location: paths./rest/openehr/v1/query/aql and .../query/{qualified_query_name}
+    detail: >-
+      Ad-hoc and stored AQL execution, both GET and POST, with offset/fetch paging.
+      Documented across seven AQL pages at
+      https://docs.ehrbase.org/docs/EHRbase/Explore/AQL/Introduction
+- id: openehr-adl
+  name: Archetype Definition Language (ADL 1.4 and ADL 2)
+  conforms: true
+  evidence:
+    spec: openapi/vitagroup-hip-ehrbase-openehr.json
+    location: paths./rest/openehr/v1/definition/template/adl1.4 and .../adl2
+    detail: >-
+      Both template dialects are served, with adl1.4 additionally exposing
+      /webtemplate and /example projections. vitagroup publishes its own archetype and
+      template set for HIP CDR at https://github.com/vitagroupag/openEHR_models
+- id: ihe-atna
+  name: IHE ATNA (Audit Trail and Node Authentication)
+  conforms: true
+  enterprise_only: true
+  evidence:
+    docs: https://docs.ehrbase.org/docs/EHRbase/Enterprise-Features/ATNA
+    detail: >-
+      The HIP EHRbase ATNA Logging Plugin emits DICOM Audit Trail Message Format
+      records over Syslog/TLS, with a published operation-by-operation coverage list
+      and a full field mapping table (EventActionCode, EventOutcomeIndicator,
+      ActiveParticipant.UserID from Basic username or OAuth2 sub claim,
+      ParticipantObjectIdentification). A worked AuditMessage XML example is published.
+    note: Closed-source enterprise plugin; not present in the open-source build.
+- id: hl7-fhir
+  name: HL7 FHIR
+  conforms: true
+  scope: interoperability bridge, not a native FHIR server
+  evidence:
+    repos:
+    - https://github.com/vitagroupag/fhir-bridge
+    - https://github.com/vitagroupag/openFHIR
+    - https://github.com/vitagroupag/FHIRconnect-spec
+    - https://github.com/vitagroupag/FHIRconnect-mapping-lib
+    detail: >-
+      vitagroup publishes FHIR Bridge ("acts as a broker between an HL7 FHIR client and
+      an openEHR server"), openFHIR, and the FHIRconnect mapping specification and
+      library. HIP markets CDR Bridge for HL7v2 and FHIR interfaces. Release 2.32.0 and
+      2.33.0 added external FHIR terminology server validation and metrics to EHRbase
+      itself.
+    caveat: >-
+      No FHIR CapabilityStatement and no FHIR OpenAPI is published by vitagroup, so the
+      FHIR surface cannot be evaluated from a contract — only from source.
+- id: hl7-v2
+  name: HL7 v2
+  conforms: true
+  scope: product claim with a shipped component, no published contract
+  evidence:
+    detail: >-
+      HIP CDR Bridge is documented as providing HL7v2 and FHIR interfaces.
+    caveat: No HL7v2 message-profile document or conformance profile is published.
+- id: oauth2
+  name: OAuth 2.0
+  conforms: true
+  evidence:
+    docs: https://docs.ehrbase.org/docs/EHRbase/Explore/Security
+    detail: >-
+      EHRbase runs as an OAuth 2.0 resource server validating a bearer JWT against an
+      operator-configured issuer, reading realm_access.roles / scope for role mapping.
+      The enterprise spec declares securitySchemes.bearerAuth (http/bearer) and applies
+      it globally.
+    spec: openapi/vitagroup-hip-ehrbase-enterprise.yml
+- id: oidc
+  name: OpenID Connect
+  conforms: partial
+  evidence:
+    detail: >-
+      Keycloak realms are the documented issuer in the HIP platform and the event-trigger
+      OAuth2 client example requests `scope: openid`, so OIDC is used operationally. But
+      vitagroup itself is not an OP and publishes no discovery document — every probed
+      /.well-known/openid-configuration returned 404 or an SPA redirect.
+    probe: well-known/vitagroup-well-known.yml
+- id: rfc7232
+  name: HTTP Conditional Requests (ETag / If-Match)
+  conforms: true
+  evidence:
+    spec: openapi/vitagroup-hip-ehrbase-openehr.json
+    detail: >-
+      If-Match is a declared header parameter on 4 update/delete operations, and the
+      412 response is documented as returning the current version_uid in Location and
+      ETag.
+- id: rfc9457
+  name: RFC 9457 Problem Details for HTTP APIs
+  conforms: false
+  evidence:
+    detail: >-
+      application/problem+json appears in none of the four published documents. Error
+      bodies are declared as */* or text/plain with no structured fields.
+    artifact: errors/vitagroup-problem-types.yml
+- id: rfc8594
+  name: RFC 8594 Sunset HTTP Header
+  conforms: false
+  evidence:
+    detail: >-
+      No Sunset or Deprecation response header is declared or documented. Breaking
+      changes are communicated only through UPDATING.md.
+    artifact: lifecycle/vitagroup-lifecycle.yml
+- id: idempotency-key
+  name: Idempotency-Key HTTP header
+  conforms: false
+  evidence:
+    detail: >-
+      No Idempotency-Key header exists on any operation. Write safety is provided by
+      If-Match optimistic locking and by client-chosen identifiers on
+      PUT /rest/openehr/v1/ehr/{ehr_id}.
+    artifact: conventions/vitagroup-conventions.yml
+- id: asyncapi
+  name: AsyncAPI
+  conforms: false
+  evidence:
+    detail: >-
+      HIP EHRbase has a real event surface (Event Trigger over HTTP, AMQP/RabbitMQ and
+      Kafka) but publishes no AsyncAPI document describing it. Probed
+      /asyncapi.yaml and /asyncapi.json on all hosts — no hits.
+    artifact: asyncapi/vitagroup-event-trigger-webhooks.yml
+- id: scim
+  name: SCIM
+  conforms: false
+  evidence:
+    detail: >-
+      No urn:ietf:params:scim:schemas:* URN appears in any published contract. Tenant
+      and user provisioning is done through Keycloak, not through a SCIM surface
+      vitagroup exposes.
+- id: dicom
+  name: DICOM
+  conforms: partial
+  evidence:
+    detail: >-
+      DICOM appears only as the code system in ATNA audit messages (codeSystemName="DCM"),
+      not as an imaging interface. vitagroup does publish an imaging_report openEHR
+      template at https://github.com/vitagroupag/openEHR_models
+compliance_certifications:
+  published: false
+  note: >-
+    No SOC 2, ISO 27001, ISO 13485, MDR/CE or C5 attestation is published on
+    vitagroup.ag, hip.vitagroup.ag or docs.ehrbase.org, and no trust center exists
+    (probe-security-programs.py found none). Because nothing is published, no
+    Compliance or TrustCenter pointer is wired into apis.yml. For a company processing
+    German clinical data this is the single most conspicuous absence in the profile —
+    the certifications almost certainly exist commercially; they are simply not on the
+    public web.
+summary:
+  asserted: 15
+  conforms_true: 9
+  conforms_partial: 2
+  conforms_false: 4

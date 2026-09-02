@@ -1,0 +1,53 @@
+generated: '2026-09-02'
+method: searched
+source: https://hip.vitagroup.ag/en/
+plan_count: 0
+pricing_model: contact-sales
+note: >-
+  vitagroup publishes no pricing of any kind. hip.vitagroup.ag/en/pricing/ returns 404,
+  no pricing page appears anywhere in the site navigation or footer, and the EHRbase
+  docs site sitemap (54 URLs) contains no pricing route. The commercial motion is a
+  contact form. This is consistent with the product shape — HIP EHRbase is enterprise
+  software deployed into a hospital or health-region estate under a negotiated
+  agreement, not a metered public API with published tiers.
+tiers: []
+free_tier:
+  exists: true
+  form: open-source software, not a hosted free plan
+  detail: >-
+    The open-source EHRbase server is free under Apache 2.0 and can be self-hosted with
+    no commercial relationship. What is paid for is the HIP EHRbase enterprise
+    distribution — Yugabyte support, ATNA logging, Event Trigger, Transaction
+    Compensation, Multi-Tenancy and Merge EHR — plus professional services and SLAs.
+  license: Apache-2.0
+  source: https://docs.ehrbase.org/docs/EHRbase/Enterprise-Features/Overview
+paid_boundary:
+  open_source:
+  - openEHR REST API
+  - Admin API
+  - Item Tag experimental API
+  - AQL
+  - ADL 1.4 / ADL 2 template handling
+  enterprise_only:
+  - Yugabyte distributed SQL support
+  - IHE ATNA audit logging
+  - Event Trigger (HTTP / AMQP / Kafka)
+  - Transaction Compensation (contribution rollback)
+  - Multi-Tenancy
+  - Merge EHR
+  - professional services and service level agreements
+  source: https://docs.ehrbase.org/docs/EHRbase/Enterprise-Features/Overview
+probes:
+- url: https://hip.vitagroup.ag/en/pricing/
+  status: 404
+- url: https://hip.vitagroup.ag/en/contact/
+  status: 200
+  note: the actual commercial entry point
+- url: https://docs.ehrbase.org/sitemap.xml
+  status: 200
+  note: 54 URLs, no pricing route
+gaps:
+- No published price, price range, unit of metering, or even an indicative starting
+  point. A buyer cannot size the cost of HIP EHRbase without a sales conversation.
+- The open-source / enterprise feature boundary IS clearly documented, which is more
+  than most dual-licensed vendors publish — but it carries no price.
