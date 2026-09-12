@@ -1,0 +1,21 @@
+{
+  "repo": "vitagroup",
+  "feeds": [
+    {
+      "source": "https://hip.vitagroup.ag/en/contact/",
+      "feed_url": "https://hip.vitagroup.ag/en/feed/",
+      "title": "",
+      "saved": 2,
+      "method": "discovered"
+    },
+    {
+      "source": "https://hip.vitagroup.ag/en/tech-blog/",
+      "feed_url": "https://hip.vitagroup.ag/en/feed/",
+      "title": "",
+      "saved": 0,
+      "method": "discovered"
+    }
+  ],
+  "post_count": 2,
+  "fetched": "2026-09-06T19:17:18Z"
+}
