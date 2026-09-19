@@ -359,6 +359,8 @@ apis:
   humanURL: https://docs.ehrbase.org/api/hip-ehrbase/openehr
   baseURL: https://sandkiste.ehrbase.org/ehrbase
   tags:
+  - Directory
+  tags_raw:
   - DIRECTORY
   properties:
   - type: OpenAPI
@@ -469,6 +471,8 @@ apis:
   humanURL: https://docs.ehrbase.org/api/hip-ehrbase/openehr
   baseURL: https://sandkiste.ehrbase.org/ehrbase
   tags:
+  - Multi-Tenant
+  tags_raw:
   - Multi tenant
   properties:
   - type: OpenAPI
@@ -491,6 +495,8 @@ apis:
   humanURL: https://docs.ehrbase.org/api/hip-ehrbase/openehr
   baseURL: https://sandkiste.ehrbase.org/ehrbase
   tags:
+  - Query
+  tags_raw:
   - QUERY
   properties:
   - type: OpenAPI
@@ -557,6 +563,8 @@ apis:
   humanURL: https://docs.ehrbase.org/api/hip-ehrbase/openehr
   baseURL: https://sandkiste.ehrbase.org/ehrbase
   tags:
+  - Templates
+  tags_raw:
   - TEMPLATE
   properties:
   - type: OpenAPI
