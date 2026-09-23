@@ -1,0 +1,785 @@
+openapi: 3.2.0
+info:
+  title: EHRbase Admin - EHR-Merge API
+  description: 'EHRbase implements the official openEHR REST API. Additionally, EHRbase provides a custom `status` heartbeat endpoint, an Admin API (if activated) and a Status and Metrics API (if activated) for monitoring and maintenance. Note: The openEHR REST API is documented in their official documentation, not here. Please refer to their separate documentation.'
+  license:
+    name: Apache 2.0
+    url: https://github.com/ehrbase/ehrbase/blob/develop/LICENSE.md
+  version: v1
+servers:
+- url: http://localhost:8080/ehrbase
+  description: Generated server url
+tags:
+- name: Admin - EHR-Merge
+paths:
+  /rest/admin/ehr/merge:
+    post:
+      tags:
+      - Admin - EHR-Merge
+      summary: Merge a source EHR into an existing target EHR
+      operationId: mergeEhrs
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MergeRequestBody'
+        required: true
+      responses:
+        '200':
+          description: EHRs have been merged and merge information will be returned in the body.
+          headers:
+            Content-Type:
+              description: Format of response
+              style: simple
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MergeDetailsDto'
+        '401':
+          description: Client credentials are invalid or have been expired.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MergeDetailsDto'
+        '403':
+          description: Client is not permitted to access this resource since the admin role is missing.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MergeDetailsDto'
+        '404':
+          description: source or target EHR could not be found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MergeDetailsDto'
+  /rest/admin/ehr/merge_target/{id}:
+    get:
+      tags:
+      - Admin - EHR-Merge
+      summary: Request the EHR id that a given EHR was merged into, taking cascading into…
+      operationId: getMergeTarget
+      parameters:
+      - name: id
+        in: path
+        description: EHR id to find the merge target for
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Return the EHR id the given EHR id was merged into. Takes cascaded merges into account.
+          headers:
+            Content-Type:
+              description: Format of response
+              style: simple
+              schema:
+                type: string
+          content:
+            text/plain:
+              schema:
+                type: string
+            application/json:
+              schema:
+                type: string
+        '401':
+          description: Client credentials are invalid or have been expired.
+          content:
+            text/plain:
+              schema:
+                type: string
+            application/json:
+              schema:
+                type: string
+        '403':
+          description: Client is not permitted to access this resource since the admin role is missing.
+          content:
+            text/plain:
+              schema:
+                type: string
+            application/json:
+              schema:
+                type: string
+        '404':
+          description: Given EHR id was not merged.
+          content:
+            text/plain:
+              schema:
+                type: string
+            application/json:
+              schema:
+                type: string
+  /rest/admin/ehr/merge_status:
+    get:
+      tags:
+      - Admin - EHR-Merge
+      summary: Request the merging status of a SOURCE_EHR and/or TARGET_EHR
+      operationId: getMergeStatusList
+      parameters:
+      - name: source
+        in: query
+        description: source EHR id to find merge status for
+        required: false
+        schema:
+          type: string
+          format: uuid
+      - name: target
+        in: query
+        description: target EHR id to find merge status for
+        required: false
+        schema:
+          type: string
+          format: uuid
+      - name: cascaded
+        in: query
+        description: whether cascaded merges shall be taken into account
+        required: false
+        schema:
+          type: boolean
+          default: false
+      responses:
+        '200':
+          description: Return all merge details for given source and/or target EHR. Will take cascaded merges into account, if specified.
+          headers:
+            Content-Type:
+              description: Format of response
+              style: simple
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MergeDetailsDto'
+        '401':
+          description: Client credentials are invalid or have been expired.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MergeDetailsDto'
+        '403':
+          description: Client is not permitted to access this resource since the admin role is missing.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MergeDetailsDto'
+        '404':
+          description: No merge details found for the given source and/or target EHR
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MergeDetailsDto'
+  /rest/admin/ehr/merge_details:
+    get:
+      tags:
+      - Admin - EHR-Merge
+      summary: Request the details of a merge operation
+      operationId: getMergeDetails
+      parameters:
+      - name: source
+        in: query
+        description: source EHR id to find merge details for
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: target
+        in: query
+        description: target EHR id to find merge details for
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: unmerge_data
+        in: query
+        description: if data for unmerging is to be included
+        required: false
+        schema:
+          type: boolean
+          default: false
+      responses:
+        '200':
+          description: Merge details for the specified merge operation will be returned in the body.
+          headers:
+            Content-Type:
+              description: Format of response
+              style: simple
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MergeDetailsDto'
+        '401':
+          description: Client credentials are invalid or have been expired.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MergeDetailsDto'
+        '403':
+          description: Client is not permitted to access this resource since the admin role is missing.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MergeDetailsDto'
+        '404':
+          description: Source EHR was not merged into target EHR.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MergeDetailsDto'
+components:
+  schemas:
+    ArchetypeID:
+      type: object
+      properties:
+        qualified_rm_entity:
+          type: string
+          writeOnly: true
+        domain_concept:
+          type: string
+          writeOnly: true
+        rm_originator:
+          type: string
+          writeOnly: true
+        rm_name:
+          type: string
+          writeOnly: true
+        rm_entity:
+          type: string
+          writeOnly: true
+        specialisation:
+          type: string
+        versionId:
+          type: string
+        value:
+          type: string
+        namespace:
+          type: string
+        qualifiedRmEntity:
+          type: string
+        domainConcept:
+          type: string
+        rmOriginator:
+          type: string
+        rmName:
+          type: string
+        rmEntity:
+          type: string
+        semanticId:
+          type: string
+        fullId:
+          type: string
+    MergeOutcomeDto:
+      type: object
+      properties:
+        level:
+          type: string
+          enum:
+          - BASIC
+          - FOLDER_COPY
+        summary:
+          type: string
+    ItemTagDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        target:
+          type: string
+          format: uuid
+        key:
+          type: string
+        value:
+          type: string
+        owner_id:
+          type: string
+          format: uuid
+        target_type:
+          type: string
+          enum:
+          - EHR_STATUS
+          - COMPOSITION
+        target_path:
+          type: string
+    DvURI:
+      type: object
+      properties:
+        value:
+          type: string
+          format: uri
+    DvDateTime:
+      type: object
+      properties:
+        normalStatus:
+          $ref: '#/components/schemas/CodePhrase'
+        normalRange:
+          $ref: '#/components/schemas/DvIntervalDvDateTime'
+        otherReferenceRanges:
+          type: array
+          items:
+            $ref: '#/components/schemas/ReferenceRangeDvDateTime'
+        magnitudeStatus:
+          type: string
+        accuracy:
+          $ref: '#/components/schemas/DvDuration'
+        value:
+          type: object
+    UIDBasedId:
+      type: object
+      properties:
+        value:
+          type: string
+    DvIntervalDvDateTime:
+      type: object
+      properties:
+        lower:
+          $ref: '#/components/schemas/DvDateTime'
+        upper:
+          $ref: '#/components/schemas/DvDateTime'
+        upperUnbounded:
+          type: boolean
+        lowerIncluded:
+          type: boolean
+        lowerUnbounded:
+          type: boolean
+        upperIncluded:
+          type: boolean
+    ItemStructure:
+      type: object
+      properties:
+        name:
+          $ref: '#/components/schemas/DvText'
+        archetypeNodeId:
+          type: string
+        uid:
+          $ref: '#/components/schemas/UIDBasedId'
+        archetypeDetails:
+          $ref: '#/components/schemas/Archetyped'
+        feederAudit:
+          $ref: '#/components/schemas/FeederAudit'
+        links:
+          type: array
+          items:
+            $ref: '#/components/schemas/Link'
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Item'
+        path:
+          type: string
+    CodePhrase:
+      type: object
+      properties:
+        terminologyId:
+          $ref: '#/components/schemas/TerminologyId'
+        codeString:
+          type: string
+        preferredTerm:
+          type: string
+    DvDuration:
+      type: object
+      properties:
+        normalStatus:
+          $ref: '#/components/schemas/CodePhrase'
+        normalRange:
+          $ref: '#/components/schemas/DvIntervalDvDuration'
+        otherReferenceRanges:
+          type: array
+          items:
+            $ref: '#/components/schemas/ReferenceRangeDvDuration'
+        magnitudeStatus:
+          type: string
+        accuracy:
+          type: number
+          format: double
+        accuracyIsPercent:
+          type: boolean
+        value:
+          type: object
+          properties:
+            units:
+              type: array
+              items:
+                type: object
+                properties:
+                  durationEstimated:
+                    type: boolean
+                  duration:
+                    type: object
+                    properties:
+                      seconds:
+                        type: integer
+                        format: int64
+                      zero:
+                        type: boolean
+                      nano:
+                        type: integer
+                        format: int32
+                      negative:
+                        type: boolean
+                      positive:
+                        type: boolean
+                  timeBased:
+                    type: boolean
+                  dateBased:
+                    type: boolean
+    EhrUnmergeVersionData:
+      type: object
+      properties:
+        uid:
+          type: string
+          format: uuid
+        version:
+          type: integer
+          format: int32
+        sys_period_lower:
+          type: string
+          format: date-time
+        sys_period_upper:
+          type: string
+          format: date-time
+        contribution:
+          type: string
+          format: uuid
+        audit_details:
+          type: string
+          format: uuid
+        data:
+          $ref: '#/components/schemas/Locatable'
+    TemplateId:
+      type: object
+      properties:
+        value:
+          type: string
+    ObjectId:
+      type: object
+      properties:
+        value:
+          type: string
+    EhrUnmergeData:
+      type: object
+      properties:
+        ehr_creation:
+          type: string
+          format: date-time
+        ehr_status:
+          $ref: '#/components/schemas/EhrUnmergeVersionedObjectData'
+        contributions:
+          type: array
+          items:
+            type: string
+            format: uuid
+          uniqueItems: true
+        compositions:
+          type: array
+          items:
+            type: string
+            format: uuid
+          uniqueItems: true
+        deletedCompositions:
+          type: array
+          items:
+            $ref: '#/components/schemas/EhrUnmergeVersionedObjectData'
+        folders:
+          type: array
+          items:
+            $ref: '#/components/schemas/EhrUnmergeVersionedObjectData'
+        moved_item_tags:
+          type: array
+          items:
+            type: string
+            format: uuid
+          uniqueItems: true
+        deleted_item_tags:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItemTagDto'
+    PartyIdentified:
+      type: object
+      properties:
+        externalRef:
+          $ref: '#/components/schemas/PartyRef'
+        name:
+          type: string
+        identifiers:
+          type: array
+          items:
+            $ref: '#/components/schemas/DvIdentifier'
+    Link:
+      type: object
+      properties:
+        meaning:
+          $ref: '#/components/schemas/DvText'
+        type:
+          $ref: '#/components/schemas/DvText'
+        target:
+          $ref: '#/components/schemas/DvEHRURI'
+    Locatable:
+      type: object
+      properties:
+        name:
+          $ref: '#/components/schemas/DvText'
+        archetypeNodeId:
+          type: string
+        uid:
+          $ref: '#/components/schemas/UIDBasedId'
+        archetypeDetails:
+          $ref: '#/components/schemas/Archetyped'
+        feederAudit:
+          $ref: '#/components/schemas/FeederAudit'
+        links:
+          type: array
+          items:
+            $ref: '#/components/schemas/Link'
+        path:
+          type: string
+    DvIntervalDvDuration:
+      type: object
+      properties:
+        lower:
+          $ref: '#/components/schemas/DvDuration'
+        upper:
+          $ref: '#/components/schemas/DvDuration'
+        upperUnbounded:
+          type: boolean
+        lowerIncluded:
+          type: boolean
+        lowerUnbounded:
+          type: boolean
+        upperIncluded:
+          type: boolean
+    TerminologyId:
+      type: object
+      properties:
+        value:
+          type: string
+    Item:
+      type: object
+      properties:
+        name:
+          $ref: '#/components/schemas/DvText'
+        archetypeNodeId:
+          type: string
+        uid:
+          $ref: '#/components/schemas/UIDBasedId'
+        archetypeDetails:
+          $ref: '#/components/schemas/Archetyped'
+        feederAudit:
+          $ref: '#/components/schemas/FeederAudit'
+        links:
+          type: array
+          items:
+            $ref: '#/components/schemas/Link'
+        path:
+          type: string
+    Archetyped:
+      type: object
+      properties:
+        archetypeId:
+          $ref: '#/components/schemas/ArchetypeID'
+        templateId:
+          $ref: '#/components/schemas/TemplateId'
+        rmVersion:
+          type: string
+    PartyRef:
+      type: object
+      properties:
+        namespace:
+          type: string
+        type:
+          type: string
+        id:
+          $ref: '#/components/schemas/ObjectId'
+    DvIdentifier:
+      type: object
+      properties:
+        issuer:
+          type: string
+        assigner:
+          type: string
+        id:
+          type: string
+        type:
+          type: string
+    FeederAudit:
+      type: object
+      properties:
+        originatingSystemItemIds:
+          type: array
+          items:
+            $ref: '#/components/schemas/DvIdentifier'
+        feederSystemItemIds:
+          type: array
+          items:
+            $ref: '#/components/schemas/DvIdentifier'
+        originalContent:
+          $ref: '#/components/schemas/DvEncapsulated'
+        originatingSystemAudit:
+          $ref: '#/components/schemas/FeederAuditDetails'
+        feederSystemAudit:
+          $ref: '#/components/schemas/FeederAuditDetails'
+    ReferenceRangeDvDuration:
+      type: object
+      properties:
+        range:
+          $ref: '#/components/schemas/DvIntervalDvDuration'
+        meaning:
+          $ref: '#/components/schemas/DvText'
+    DvEHRURI:
+      type: object
+      properties:
+        value:
+          type: string
+          format: uri
+    DvEncapsulated:
+      type: object
+      properties:
+        charset:
+          $ref: '#/components/schemas/CodePhrase'
+        language:
+          $ref: '#/components/schemas/CodePhrase'
+    DvText:
+      type: object
+      properties:
+        value:
+          type: string
+        hyperlink:
+          $ref: '#/components/schemas/DvURI'
+        formatting:
+          type: string
+        mappings:
+          type: array
+          items:
+            $ref: '#/components/schemas/TermMapping'
+        language:
+          $ref: '#/components/schemas/CodePhrase'
+        encoding:
+          $ref: '#/components/schemas/CodePhrase'
+    TermMapping:
+      type: object
+      properties:
+        match:
+          type: string
+        purpose:
+          $ref: '#/components/schemas/DvCodedText'
+        target:
+          $ref: '#/components/schemas/CodePhrase'
+    FeederAuditDetails:
+      type: object
+      properties:
+        systemId:
+          type: string
+        location:
+          $ref: '#/components/schemas/PartyIdentified'
+        provider:
+          $ref: '#/components/schemas/PartyIdentified'
+        subject:
+          $ref: '#/components/schemas/PartyProxy'
+        time:
+          $ref: '#/components/schemas/DvDateTime'
+        versionId:
+          type: string
+        otherDetails:
+          $ref: '#/components/schemas/ItemStructure'
+    MergeDetailsDto:
+      type: object
+      properties:
+        outcome:
+          $ref: '#/components/schemas/MergeOutcomeDto'
+        source_ehr:
+          type: string
+          format: uuid
+        target_ehr:
+          type: string
+          format: uuid
+        merge_date:
+          type: string
+          format: date-time
+        unmerge_data:
+          $ref: '#/components/schemas/EhrUnmergeData'
+    PartyProxy:
+      type: object
+      properties:
+        externalRef:
+          $ref: '#/components/schemas/PartyRef'
+    EhrUnmergeVersionedObjectData:
+      type: object
+      properties:
+        versions:
+          type: array
+          items:
+            $ref: '#/components/schemas/EhrUnmergeVersionData'
+        additionalDetails:
+          type: object
+          additionalProperties:
+            type: object
+          writeOnly: true
+    ReferenceRangeDvDateTime:
+      type: object
+      properties:
+        range:
+          $ref: '#/components/schemas/DvIntervalDvDateTime'
+        meaning:
+          $ref: '#/components/schemas/DvText'
+    DvCodedText:
+      type: object
+      properties:
+        value:
+          type: string
+        hyperlink:
+          $ref: '#/components/schemas/DvURI'
+        formatting:
+          type: string
+        language:
+          $ref: '#/components/schemas/CodePhrase'
+        encoding:
+          $ref: '#/components/schemas/CodePhrase'
+        definingCode:
+          $ref: '#/components/schemas/CodePhrase'
+    MergeRequestBody:
+      type: object
+      properties:
+        source_ehr:
+          type: string
+          format: uuid
+        target_ehr:
+          type: string
+          format: uuid
+        detail_level:
+          type: string
+          enum:
+          - BASIC
+          - FOLDER_COPY
+        reversible:
+          type: boolean
+        dry_run:
+          type: boolean
+        folder_merge:
+          type: string
+          enum:
+          - BASIC
+          - COPY
+        composition_merge:
+          type: string
+          enum:
+          - BASIC
+          - PERSISTENT
+      required:
+      - reversible
+      - source_ehr
+      - target_ehr
+externalDocs:
+  description: EHRbase Documentation
+  url: https://docs.ehrbase.org/

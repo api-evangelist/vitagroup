@@ -1,0 +1,544 @@
+openapi: 3.2.0
+info:
+  title: EHRbase COMPOSITION API
+  description: 'EHRbase implements the official openEHR REST API. Additionally, EHRbase provides a custom `status` heartbeat endpoint, an Admin API (if activated) and a Status and Metrics API (if activated) for monitoring and maintenance. Note: The openEHR REST API is documented in their official documentation, not here. Please refer to their separate documentation.'
+  license:
+    name: Apache 2.0
+    url: https://github.com/ehrbase/ehrbase/blob/develop/LICENSE.md
+  version: v1
+servers:
+- url: https://sandkiste.ehrbase.org/ehrbase
+  description: Generated server url
+tags:
+- name: Composition
+paths:
+  /rest/openehr/v1/ehr/{ehr_id}/composition/{versioned_object_uid}:
+    get:
+      tags:
+      - Composition
+      summary: Get composition at time
+      externalDocs:
+        url: https://specifications.openehr.org/releases/ITS-REST/latest/ehr.html#composition-composition-get
+      operationId: getComposition
+      parameters:
+      - name: Accept
+        in: header
+        required: false
+        schema:
+          type: string
+      - name: ehr_id
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: versioned_object_uid
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: format
+        in: query
+        description: Composition format
+        required: false
+        schema:
+          type: string
+          enum:
+          - JSON
+          - XML
+          - STRUCTURED
+          - FLAT
+      - name: version_at_time
+        in: query
+        required: false
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: string
+            application/xml:
+              schema:
+                type: string
+            application/openehr.wt.flat.schema+json:
+              schema:
+                type: string
+            application/openehr.wt.structured.schema+json:
+              schema:
+                type: string
+    put:
+      tags:
+      - Composition
+      summary: Update composition
+      externalDocs:
+        url: https://specifications.openehr.org/releases/ITS-REST/latest/ehr.html#composition-composition-put
+      operationId: updateComposition
+      parameters:
+      - name: openehrVersion
+        in: query
+        required: true
+        schema:
+          type: string
+      - name: openEHR-AUDIT_DETAILS
+        in: header
+        required: false
+        schema:
+          type: string
+      - name: Content-Type
+        in: header
+        required: false
+        schema:
+          type: string
+      - name: Accept
+        in: header
+        required: false
+        schema:
+          type: string
+      - name: Prefer
+        in: header
+        required: false
+        schema:
+          type: string
+      - name: If-Match
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: ehr_id
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: versioned_object_uid
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: templateId
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: format
+        in: query
+        description: Composition format
+        required: false
+        schema:
+          type: string
+          enum:
+          - JSON
+          - XML
+          - STRUCTURED
+          - FLAT
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: string
+          application/xml:
+            schema:
+              type: string
+          application/openehr.wt.flat.schema+json:
+            schema:
+              type: string
+          application/openehr.wt.structured.schema+json:
+            schema:
+              type: string
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: string
+            application/xml:
+              schema:
+                type: string
+            application/openehr.wt.flat.schema+json:
+              schema:
+                type: string
+            application/openehr.wt.structured.schema+json:
+              schema:
+                type: string
+  /rest/ecis/v1/composition/{uid}:
+    get:
+      tags:
+      - Composition
+      summary: Deprecated since 2.0.0 and marked for removal
+      description: Replaced by /rest/openehr/v1/ehr/{ehr_id}/composition/{versioned_object_uid}
+      operationId: getComposition_1
+      parameters:
+      - name: uid
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: format
+        in: query
+        required: false
+        schema:
+          type: string
+          default: XML
+          enum:
+          - FLAT
+          - STRUCTURED
+          - RAW
+          - XML
+          - ECISFLAT
+          - EXPANDED
+          - JSON
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CompositionResponseData'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/CompositionResponseData'
+      deprecated: true
+    put:
+      tags:
+      - Composition
+      summary: Deprecated since 2.0.0 and marked for removal
+      description: Replaced by /rest/openehr/v1/ehr/{ehr_id}/composition/{versioned_object_uid}
+      operationId: update
+      parameters:
+      - name: uid
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: format
+        in: query
+        required: false
+        schema:
+          type: string
+          default: XML
+          enum:
+          - FLAT
+          - STRUCTURED
+          - RAW
+          - XML
+          - ECISFLAT
+          - EXPANDED
+          - JSON
+      - name: templateId
+        in: query
+        required: false
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: string
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ActionRestResponseData'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/ActionRestResponseData'
+      deprecated: true
+    delete:
+      tags:
+      - Composition
+      summary: Deprecated since 2.0.0 and marked for removal
+      description: Replaced by /rest/openehr/v1/ehr/{ehr_id}/composition/{versioned_object_uid}
+      operationId: delete
+      parameters:
+      - name: uid
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ActionRestResponseData'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/ActionRestResponseData'
+      deprecated: true
+  /rest/openehr/v1/ehr/{ehr_id}/composition:
+    post:
+      tags:
+      - Composition
+      summary: Create composition
+      externalDocs:
+        url: https://specifications.openehr.org/releases/ITS-REST/latest/ehr.html#composition-composition-post
+      operationId: createComposition
+      parameters:
+      - name: openEHR-VERSION
+        in: header
+        required: false
+        schema:
+          type: string
+      - name: openEHR-AUDIT_DETAILS
+        in: header
+        required: false
+        schema:
+          type: string
+      - name: Content-Type
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: Accept
+        in: header
+        required: false
+        schema:
+          type: string
+      - name: Prefer
+        in: header
+        required: false
+        schema:
+          type: string
+      - name: ehr_id
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: templateId
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: format
+        in: query
+        description: Composition format
+        required: false
+        schema:
+          type: string
+          enum:
+          - JSON
+          - XML
+          - STRUCTURED
+          - FLAT
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: string
+          application/xml:
+            schema:
+              type: string
+          application/openehr.wt.flat.schema+json:
+            schema:
+              type: string
+          application/openehr.wt.structured.schema+json:
+            schema:
+              type: string
+        required: true
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+            application/xml:
+              schema:
+                type: object
+            application/openehr.wt.flat.schema+json:
+              schema:
+                type: object
+            application/openehr.wt.structured.schema+json:
+              schema:
+                type: object
+  /rest/ecis/v1/composition:
+    post:
+      tags:
+      - Composition
+      summary: Deprecated since 2.0.0 and marked for removal
+      description: Replaced by /rest/openehr/v1/ehr/{ehr_id}/composition
+      operationId: createComposition_1
+      parameters:
+      - name: format
+        in: query
+        required: false
+        schema:
+          type: string
+          default: XML
+          enum:
+          - FLAT
+          - STRUCTURED
+          - RAW
+          - XML
+          - ECISFLAT
+          - EXPANDED
+          - JSON
+      - name: templateId
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: ehrId
+        in: query
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: string
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CompositionWriteRestResponseData'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/CompositionWriteRestResponseData'
+      deprecated: true
+  /rest/openehr/v1/ehr/{ehr_id}/composition/{preceding_version_uid}:
+    delete:
+      tags:
+      - Composition
+      summary: Delete composition
+      externalDocs:
+        url: https://specifications.openehr.org/releases/ITS-REST/latest/ehr.html#composition-composition-delete
+      operationId: deleteComposition
+      parameters:
+      - name: openEHR-VERSION
+        in: header
+        required: false
+        schema:
+          type: string
+      - name: openEHR-AUDIT_DETAILS
+        in: header
+        required: false
+        schema:
+          type: string
+      - name: ehr_id
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: preceding_version_uid
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '204':
+          description: No Content
+          content:
+            application/json:
+              schema:
+                type: string
+            application/xml:
+              schema:
+                type: string
+            application/openehr.wt.flat.schema+json:
+              schema:
+                type: string
+            application/openehr.wt.structured.schema+json:
+              schema:
+                type: string
+components:
+  schemas:
+    Meta:
+      type: object
+      properties:
+        href:
+          $ref: '#/components/schemas/RestHref'
+        precedingHref:
+          $ref: '#/components/schemas/RestHref'
+        nextHref:
+          $ref: '#/components/schemas/RestHref'
+    CompositionResponseData:
+      type: object
+      properties:
+        meta:
+          $ref: '#/components/schemas/Meta'
+        action:
+          type: string
+          enum:
+          - RETRIEVE
+          - CREATE
+          - UPDATE
+          - MERGE
+          - DELETE
+        composition:
+          $ref: '#/components/schemas/StructuredString'
+        format:
+          type: string
+          enum:
+          - FLAT
+          - STRUCTURED
+          - RAW
+          - XML
+          - ECISFLAT
+          - EXPANDED
+          - JSON
+        templateId:
+          type: string
+        ehrId:
+          type: string
+          format: uuid
+        compositionUid:
+          type: string
+    StructuredString:
+      type: object
+      properties:
+        format:
+          type: string
+          enum:
+          - XML
+          - JSON
+        value:
+          type: string
+    CompositionWriteRestResponseData:
+      type: object
+      properties:
+        meta:
+          $ref: '#/components/schemas/Meta'
+        action:
+          type: string
+          enum:
+          - RETRIEVE
+          - CREATE
+          - UPDATE
+          - MERGE
+          - DELETE
+        compositionUid:
+          type: string
+    RestHref:
+      type: object
+      properties:
+        url:
+          type: string
+    ActionRestResponseData:
+      type: object
+      properties:
+        meta:
+          $ref: '#/components/schemas/Meta'
+        action:
+          type: string
+          enum:
+          - RETRIEVE
+          - CREATE
+          - UPDATE
+          - MERGE
+          - DELETE
+externalDocs:
+  description: EHRbase Documentation
+  url: https://docs.ehrbase.org/

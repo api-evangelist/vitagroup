@@ -1,0 +1,475 @@
+openapi: 3.2.0
+info:
+  title: EHRbase CONTRIBUTION API
+  description: 'EHRbase implements the official openEHR REST API. Additionally, EHRbase provides a custom `status` heartbeat endpoint, an Admin API (if activated) and a Status and Metrics API (if activated) for monitoring and maintenance. Note: The openEHR REST API is documented in their official documentation, not here. Please refer to their separate documentation.'
+  license:
+    name: Apache 2.0
+    url: https://github.com/ehrbase/ehrbase/blob/develop/LICENSE.md
+  version: v1
+servers:
+- url: https://sandkiste.ehrbase.org/ehrbase
+  description: Generated server url
+tags:
+- name: Contribution
+paths:
+  /rest/openehr/v1/ehr/{ehr_id}/contribution:
+    post:
+      tags:
+      - Contribution
+      summary: Create contribution
+      externalDocs:
+        url: https://specifications.openehr.org/releases/ITS-REST/latest/ehr.html#contribution-contribution-post
+      operationId: createContribution
+      parameters:
+      - name: openEHR-VERSION
+        in: header
+        required: false
+        schema:
+          type: string
+      - name: openEHR-AUDIT_DETAILS
+        in: header
+        required: false
+        schema:
+          type: string
+      - name: Content-Type
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: Accept
+        in: header
+        required: false
+        schema:
+          type: string
+      - name: Prefer
+        in: header
+        required: false
+        schema:
+          type: string
+      - name: ehr_id
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/xml:
+            schema:
+              $ref: '#/components/schemas/CONTRIBUTION'
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CONTRIBUTION'
+        required: true
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Contribution'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Contribution'
+  /rest/openehr/v1/ehr/{ehr_id}/contribution/{contribution_uid}:
+    get:
+      tags:
+      - Contribution
+      summary: Get contribution by id
+      externalDocs:
+        url: https://specifications.openehr.org/releases/ITS-REST/latest/ehr.html#contribution-contribution-get
+      operationId: getContribution
+      parameters:
+      - name: openEHR-VERSION
+        in: header
+        required: false
+        schema:
+          type: string
+      - name: openEHR-AUDIT_DETAILS
+        in: header
+        required: false
+        schema:
+          type: string
+      - name: Accept
+        in: header
+        required: false
+        schema:
+          type: string
+      - name: ehr_id
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: contribution_uid
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Contribution'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Contribution'
+components:
+  schemas:
+    DvURI:
+      type: 'null'
+      properties:
+        value:
+          type: string
+          format: uri
+    DvDateTime:
+      type: 'null'
+      properties:
+        normalStatus:
+          $ref: '#/components/schemas/CodePhrase'
+        normalRange:
+          $ref: '#/components/schemas/DvIntervalDvDateTime'
+        otherReferenceRanges:
+          type:
+          - array
+          - 'null'
+          items:
+            $ref: '#/components/schemas/ReferenceRangeDvDateTime'
+        magnitudeStatus:
+          type:
+          - string
+          - 'null'
+        accuracy:
+          $ref: '#/components/schemas/DvDuration'
+        value: {}
+    DvIntervalDvDateTime:
+      type: 'null'
+      properties:
+        lower:
+          $ref: '#/components/schemas/DvDateTime'
+        upper:
+          $ref: '#/components/schemas/DvDateTime'
+        lowerUnbounded:
+          type: boolean
+        upperUnbounded:
+          type: boolean
+        lowerIncluded:
+          type: boolean
+        upperIncluded:
+          type: boolean
+    ObjectVersionId:
+      type: object
+      properties:
+        value:
+          type: string
+    CodePhrase:
+      type: 'null'
+      properties:
+        terminologyId:
+          $ref: '#/components/schemas/TerminologyId'
+        codeString:
+          type: string
+        preferredTerm:
+          type:
+          - string
+          - 'null'
+    DvDuration:
+      type: 'null'
+      properties:
+        normalStatus:
+          $ref: '#/components/schemas/CodePhrase'
+        normalRange:
+          $ref: '#/components/schemas/DvIntervalDvDuration'
+        otherReferenceRanges:
+          type:
+          - array
+          - 'null'
+          items:
+            $ref: '#/components/schemas/ReferenceRangeDvDuration'
+        magnitudeStatus:
+          type:
+          - string
+          - 'null'
+        accuracy:
+          type:
+          - number
+          - 'null'
+          format: double
+        accuracyIsPercent:
+          type:
+          - boolean
+          - 'null'
+        value:
+          type: object
+          properties:
+            units:
+              type: array
+              items:
+                type: object
+                properties:
+                  durationEstimated:
+                    type: boolean
+                  duration:
+                    type: string
+                  timeBased:
+                    type: boolean
+                  dateBased:
+                    type: boolean
+    Attestation:
+      type: object
+      properties:
+        systemId:
+          type: string
+        timeCommitted:
+          $ref: '#/components/schemas/DvDateTime'
+        changeType:
+          $ref: '#/components/schemas/DvCodedText'
+        description:
+          $ref: '#/components/schemas/DvText'
+        committer:
+          $ref: '#/components/schemas/PartyProxy'
+        attestedView:
+          $ref: '#/components/schemas/DvMultimedia'
+        proof:
+          type:
+          - string
+          - 'null'
+        items:
+          type:
+          - array
+          - 'null'
+          items:
+            $ref: '#/components/schemas/DvEHRURI'
+        reason:
+          $ref: '#/components/schemas/DvText'
+        pending:
+          type: boolean
+    ObjectId:
+      type: object
+      properties:
+        value:
+          type: string
+    OriginalVersionRMObject:
+      type: object
+      properties:
+        contribution:
+          $ref: '#/components/schemas/ObjectRefObjectId'
+        signature:
+          type:
+          - string
+          - 'null'
+        commitAudit:
+          $ref: '#/components/schemas/AuditDetails'
+        uid:
+          $ref: '#/components/schemas/ObjectVersionId'
+        precedingVersionUid:
+          $ref: '#/components/schemas/ObjectVersionId'
+        otherInputVersionUids:
+          type:
+          - array
+          - 'null'
+          items:
+            $ref: '#/components/schemas/ObjectVersionId'
+        lifecycleState:
+          $ref: '#/components/schemas/DvCodedText'
+        attestations:
+          type:
+          - array
+          - 'null'
+          items:
+            $ref: '#/components/schemas/Attestation'
+        data:
+          $ref: '#/components/schemas/RMObject'
+        branch:
+          type: boolean
+        canonicalForm:
+          type: string
+    ObjectRefObjectId:
+      type: object
+      properties:
+        namespace:
+          type: string
+        type:
+          type: string
+        id:
+          $ref: '#/components/schemas/ObjectId'
+    Contribution:
+      type: object
+      properties:
+        uid:
+          $ref: '#/components/schemas/HierObjectId'
+        versions:
+          type: array
+          items:
+            $ref: '#/components/schemas/ObjectRefObjectId'
+        audit:
+          $ref: '#/components/schemas/AuditDetails'
+    HierObjectId:
+      type: object
+      properties:
+        value:
+          type: string
+    DvIntervalDvDuration:
+      type: 'null'
+      properties:
+        lower:
+          $ref: '#/components/schemas/DvDuration'
+        upper:
+          $ref: '#/components/schemas/DvDuration'
+        lowerUnbounded:
+          type: boolean
+        upperUnbounded:
+          type: boolean
+        lowerIncluded:
+          type: boolean
+        upperIncluded:
+          type: boolean
+    TerminologyId:
+      type: object
+      properties:
+        value:
+          type: string
+    AuditDetails:
+      type: object
+      properties:
+        systemId:
+          type: string
+        timeCommitted:
+          $ref: '#/components/schemas/DvDateTime'
+        changeType:
+          $ref: '#/components/schemas/DvCodedText'
+        description:
+          $ref: '#/components/schemas/DvText'
+        committer:
+          $ref: '#/components/schemas/PartyProxy'
+    CONTRIBUTION:
+      type: object
+      properties:
+        uid:
+          $ref: '#/components/schemas/HierObjectId'
+        audit:
+          $ref: '#/components/schemas/AuditDetails'
+        versions:
+          type: array
+          items:
+            $ref: '#/components/schemas/OriginalVersionRMObject'
+    PartyRef:
+      type: 'null'
+      properties:
+        namespace:
+          type: string
+        type:
+          type: string
+        id:
+          $ref: '#/components/schemas/ObjectId'
+    DvMultimedia:
+      type: 'null'
+      properties:
+        charset:
+          $ref: '#/components/schemas/CodePhrase'
+        language:
+          $ref: '#/components/schemas/CodePhrase'
+        alternateText:
+          type:
+          - string
+          - 'null'
+        uri:
+          $ref: '#/components/schemas/DvURI'
+        data:
+          type:
+          - string
+          - 'null'
+          format: byte
+        mediaType:
+          $ref: '#/components/schemas/CodePhrase'
+        compressionAlgorithm:
+          $ref: '#/components/schemas/CodePhrase'
+        integrityCheck:
+          type:
+          - string
+          - 'null'
+          format: byte
+        integrityCheckAlgorithm:
+          $ref: '#/components/schemas/CodePhrase'
+        size:
+          type: integer
+          format: int32
+        thumbnail:
+          $ref: '#/components/schemas/DvMultimedia'
+    ReferenceRangeDvDuration:
+      type: object
+      properties:
+        range:
+          $ref: '#/components/schemas/DvIntervalDvDuration'
+        meaning:
+          $ref: '#/components/schemas/DvText'
+    RMObject:
+      type: 'null'
+    DvEHRURI:
+      type: object
+      properties:
+        value:
+          type: string
+          format: uri
+    DvText:
+      type: object
+      properties:
+        value:
+          type: string
+        hyperlink:
+          $ref: '#/components/schemas/DvURI'
+        formatting:
+          type:
+          - string
+          - 'null'
+        mappings:
+          type:
+          - array
+          - 'null'
+          items:
+            $ref: '#/components/schemas/TermMapping'
+        language:
+          $ref: '#/components/schemas/CodePhrase'
+        encoding:
+          $ref: '#/components/schemas/CodePhrase'
+    TermMapping:
+      type: object
+      properties:
+        match:
+          type: string
+        purpose:
+          $ref: '#/components/schemas/DvCodedText'
+        target:
+          $ref: '#/components/schemas/CodePhrase'
+    PartyProxy:
+      type: 'null'
+      properties:
+        externalRef:
+          $ref: '#/components/schemas/PartyRef'
+    ReferenceRangeDvDateTime:
+      type: object
+      properties:
+        range:
+          $ref: '#/components/schemas/DvIntervalDvDateTime'
+        meaning:
+          $ref: '#/components/schemas/DvText'
+    DvCodedText:
+      type: 'null'
+      properties:
+        value:
+          type: string
+        hyperlink:
+          $ref: '#/components/schemas/DvURI'
+        formatting:
+          type:
+          - string
+          - 'null'
+        language:
+          $ref: '#/components/schemas/CodePhrase'
+        encoding:
+          $ref: '#/components/schemas/CodePhrase'
+        definingCode:
+          $ref: '#/components/schemas/CodePhrase'
+externalDocs:
+  description: EHRbase Documentation
+  url: https://docs.ehrbase.org/

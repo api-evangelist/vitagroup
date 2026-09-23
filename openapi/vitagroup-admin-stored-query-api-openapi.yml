@@ -1,0 +1,57 @@
+openapi: 3.2.0
+info:
+  title: Vitagroup Admin - Stored-Query API
+  version: v1
+  license:
+    name: Apache 2.0
+    url: https://github.com/ehrbase/ehrbase/blob/develop/LICENSE.md
+  description: 'Operations tagged Admin - Stored-Query across 2 of this provider''s published API definitions: vitagroup-ehrbase-sandbox-live.json, vitagroup-hip-ehrbase-admin.json. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://sandkiste.ehrbase.org/ehrbase
+  description: Generated server url
+- url: http://localhost:8080/ehrbase
+  description: Generated server url
+tags:
+- name: Admin - Stored-Query
+paths:
+  /rest/admin/query/{qualified_query_name}/{version}:
+    delete:
+      tags:
+      - Admin - Stored-Query
+      operationId: deleteStoredQuery
+      parameters:
+      - name: Accept
+        in: header
+        required: false
+        schema:
+          type: string
+      - name: qualified_query_name
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: version
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Stored-Query has been deleted successfully
+        '401':
+          description: Client credentials are invalid or have expired.
+        '403':
+          description: Client has no permission to access since admin role is missing.
+        '404':
+          description: Stored-Query could not be found.
+      summary: Delete stored query
+      x-summary-source: derived
+    servers:
+    - url: https://sandkiste.ehrbase.org/ehrbase
+      description: Generated server url
+externalDocs:
+  description: EHRbase Documentation
+  url: https://docs.ehrbase.org/
+x-refined-from:
+- vitagroup-ehrbase-sandbox-live.json
+- vitagroup-hip-ehrbase-admin.json

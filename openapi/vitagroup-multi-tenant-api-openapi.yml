@@ -1,0 +1,91 @@
+openapi: 3.2.0
+info:
+  title: HIP EHRbase Multi tenant API
+  description: 'HIP EHRbase Enterprise operations that are not part of the OSS, but are part of enterprise feature.
+
+    Requires authorization with a tenant user upfront.'
+  version: 2.0.0
+  contact: {}
+servers:
+- url: https://{ehrbaseBaseUrl}
+  description: An example HIP EHRbase API URL.
+  variables:
+    ehrbaseBaseUrl:
+      default: hip-ehrbase.dev
+security:
+- bearerAuth: []
+tags:
+- name: Multi tenant
+paths:
+  /plugin/multi-tenant/service:
+    get:
+      tags:
+      - Multi tenant
+      summary: Get tenants
+      operationId: getTenants
+      responses:
+        '200':
+          description: ''
+    post:
+      tags:
+      - Multi tenant
+      summary: Store tenant
+      operationId: storeTenant
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                tenantId:
+                  type: string
+                  example: '{{$guid}}'
+                tenantName:
+                  type: string
+                  example: cdr-core-sanity-check
+                tenantProperties:
+                  type: object
+                  properties:
+                    client-id:
+                      type: string
+                      example: HIP-CDR-EHRbase-Service
+                    host:
+                      type: string
+                      example: '{{keycloakUrl}}'
+                    realm:
+                      type: string
+                      example: cdr-core-sanity-check
+            examples:
+              Store tenant:
+                value:
+                  tenantId: '{{$guid}}'
+                  tenantName: cdr-core-sanity-check
+                  tenantProperties:
+                    client-id: HIP-CDR-EHRbase-Service
+                    host: '{{keycloakUrl}}'
+                    realm: cdr-core-sanity-check
+      responses:
+        '200':
+          description: ''
+  /plugin/multi-tenant/service/{tenant_id}:
+    delete:
+      tags:
+      - Multi tenant
+      summary: Delete Tenant
+      description: Delete Tenants
+      operationId: deleteTenant
+      responses:
+        '200':
+          description: ''
+      parameters:
+      - name: tenant_id
+        in: path
+        required: true
+        schema:
+          type: string
+          example: '{{$guid}}'
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer

@@ -1,0 +1,723 @@
+openapi: 3.2.0
+info:
+  title: EHRbase VERSIONED EHR STATUS API
+  description: 'EHRbase implements the official openEHR REST API. Additionally, EHRbase provides a custom `status` heartbeat endpoint, an Admin API (if activated) and a Status and Metrics API (if activated) for monitoring and maintenance. Note: The openEHR REST API is documented in their official documentation, not here. Please refer to their separate documentation.'
+  license:
+    name: Apache 2.0
+    url: https://github.com/ehrbase/ehrbase/blob/develop/LICENSE.md
+  version: v1
+servers:
+- url: https://sandkiste.ehrbase.org/ehrbase
+  description: Generated server url
+tags:
+- name: VERSIONED_EHR_STATUS
+paths:
+  /rest/openehr/v1/ehr/{ehr_id}/versioned_ehr_status:
+    get:
+      tags:
+      - VERSIONED_EHR_STATUS
+      summary: Get versioned EHR_STATUS
+      externalDocs:
+        url: https://specifications.openehr.org/releases/ITS-REST/latest/ehr.html#ehr_status-versioned_ehr_status-get
+      operationId: retrieveVersionedEhrStatusByEhr
+      parameters:
+      - name: ehr_id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VersionedEhrStatus'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/VersionedEhrStatus'
+  /rest/openehr/v1/ehr/{ehr_id}/versioned_ehr_status/version:
+    get:
+      tags:
+      - VERSIONED_EHR_STATUS
+      summary: Get versioned EHR_STATUS version by time
+      externalDocs:
+        url: https://specifications.openehr.org/releases/ITS-REST/latest/ehr.html#ehr_status-versioned_ehr_status-get-2
+      operationId: retrieveVersionOfEhrStatusByTime
+      parameters:
+      - name: ehr_id
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: version_at_time
+        in: query
+        required: false
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OriginalVersionEhrStatus'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/OriginalVersionEhrStatus'
+  /rest/openehr/v1/ehr/{ehr_id}/versioned_ehr_status/version/{version_uid}:
+    get:
+      tags:
+      - VERSIONED_EHR_STATUS
+      summary: Get versioned EHR_STATUS version by id
+      externalDocs:
+        url: https://specifications.openehr.org/releases/ITS-REST/latest/ehr.html#ehr_status-versioned_ehr_status-get-3
+      operationId: retrieveVersionOfEhrStatusByVersionUid
+      parameters:
+      - name: ehr_id
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: version_uid
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OriginalVersionEhrStatus'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/OriginalVersionEhrStatus'
+  /rest/openehr/v1/ehr/{ehr_id}/versioned_ehr_status/revision_history:
+    get:
+      tags:
+      - VERSIONED_EHR_STATUS
+      summary: Get versioned EHR_STATUS revision history
+      externalDocs:
+        url: https://specifications.openehr.org/releases/ITS-REST/latest/ehr.html#ehr_status-versioned_ehr_status-get-1
+      operationId: retrieveVersionedEhrStatusRevisionHistoryByEhr
+      parameters:
+      - name: ehr_id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RevisionHistory'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/RevisionHistory'
+components:
+  schemas:
+    ArchetypeID:
+      type: object
+      properties:
+        qualified_rm_entity:
+          type: string
+          writeOnly: true
+        domain_concept:
+          type: string
+          writeOnly: true
+        rm_originator:
+          type: string
+          writeOnly: true
+        rm_name:
+          type: string
+          writeOnly: true
+        rm_entity:
+          type: string
+          writeOnly: true
+        specialisation:
+          type:
+          - string
+          - 'null'
+        versionId:
+          type:
+          - string
+          - 'null'
+        value:
+          type: string
+        namespace:
+          type:
+          - string
+          - 'null'
+        qualifiedRmEntity:
+          type:
+          - string
+          - 'null'
+        domainConcept:
+          type:
+          - string
+          - 'null'
+        rmOriginator:
+          type:
+          - string
+          - 'null'
+        rmName:
+          type:
+          - string
+          - 'null'
+        rmEntity:
+          type:
+          - string
+          - 'null'
+        semanticId:
+          type: string
+        fullId:
+          type: string
+    DvURI:
+      type: 'null'
+      properties:
+        value:
+          type: string
+          format: uri
+    DvDateTime:
+      type: 'null'
+      properties:
+        normalStatus:
+          $ref: '#/components/schemas/CodePhrase'
+        normalRange:
+          $ref: '#/components/schemas/DvIntervalDvDateTime'
+        otherReferenceRanges:
+          type:
+          - array
+          - 'null'
+          items:
+            $ref: '#/components/schemas/ReferenceRangeDvDateTime'
+        magnitudeStatus:
+          type:
+          - string
+          - 'null'
+        accuracy:
+          $ref: '#/components/schemas/DvDuration'
+        value: {}
+    UIDBasedId:
+      type: 'null'
+      properties:
+        value:
+          type: string
+    DvIntervalDvDateTime:
+      type: 'null'
+      properties:
+        lower:
+          $ref: '#/components/schemas/DvDateTime'
+        upper:
+          $ref: '#/components/schemas/DvDateTime'
+        lowerUnbounded:
+          type: boolean
+        upperUnbounded:
+          type: boolean
+        lowerIncluded:
+          type: boolean
+        upperIncluded:
+          type: boolean
+    ObjectVersionId:
+      type: object
+      properties:
+        value:
+          type: string
+    CodePhrase:
+      type: 'null'
+      properties:
+        terminologyId:
+          $ref: '#/components/schemas/TerminologyId'
+        codeString:
+          type: string
+        preferredTerm:
+          type:
+          - string
+          - 'null'
+    DvDuration:
+      type: 'null'
+      properties:
+        normalStatus:
+          $ref: '#/components/schemas/CodePhrase'
+        normalRange:
+          $ref: '#/components/schemas/DvIntervalDvDuration'
+        otherReferenceRanges:
+          type:
+          - array
+          - 'null'
+          items:
+            $ref: '#/components/schemas/ReferenceRangeDvDuration'
+        magnitudeStatus:
+          type:
+          - string
+          - 'null'
+        accuracy:
+          type:
+          - number
+          - 'null'
+          format: double
+        accuracyIsPercent:
+          type:
+          - boolean
+          - 'null'
+        value:
+          type: object
+          properties:
+            units:
+              type: array
+              items:
+                type: object
+                properties:
+                  durationEstimated:
+                    type: boolean
+                  duration:
+                    type: string
+                  timeBased:
+                    type: boolean
+                  dateBased:
+                    type: boolean
+    ItemStructure:
+      type: 'null'
+      properties:
+        name:
+          $ref: '#/components/schemas/DvText'
+        archetypeNodeId:
+          type: string
+        uid:
+          $ref: '#/components/schemas/UIDBasedId'
+        archetypeDetails:
+          $ref: '#/components/schemas/Archetyped'
+        feederAudit:
+          type: 'null'
+        links:
+          type:
+          - array
+          - 'null'
+          items:
+            $ref: '#/components/schemas/Link'
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Item'
+        path:
+          type: string
+    PartySelf:
+      type: object
+      properties:
+        externalRef:
+          $ref: '#/components/schemas/PartyRef'
+    Attestation:
+      type: object
+      properties:
+        systemId:
+          type: string
+        timeCommitted:
+          $ref: '#/components/schemas/DvDateTime'
+        changeType:
+          $ref: '#/components/schemas/DvCodedText'
+        description:
+          $ref: '#/components/schemas/DvText'
+        committer:
+          $ref: '#/components/schemas/PartyProxy'
+        attestedView:
+          $ref: '#/components/schemas/DvMultimedia'
+        proof:
+          type:
+          - string
+          - 'null'
+        items:
+          type:
+          - array
+          - 'null'
+          items:
+            $ref: '#/components/schemas/DvEHRURI'
+        reason:
+          $ref: '#/components/schemas/DvText'
+        pending:
+          type: boolean
+    TemplateId:
+      type: 'null'
+      properties:
+        value:
+          type: string
+    ObjectId:
+      type: object
+      properties:
+        value:
+          type: string
+    ObjectRefObjectId:
+      type: object
+      properties:
+        namespace:
+          type: string
+        type:
+          type: string
+        id:
+          $ref: '#/components/schemas/ObjectId'
+    PartyIdentified:
+      type: 'null'
+      properties:
+        externalRef:
+          $ref: '#/components/schemas/PartyRef'
+        name:
+          type:
+          - string
+          - 'null'
+        identifiers:
+          type:
+          - array
+          - 'null'
+          items:
+            $ref: '#/components/schemas/DvIdentifier'
+    Link:
+      type: object
+      properties:
+        meaning:
+          $ref: '#/components/schemas/DvText'
+        type:
+          $ref: '#/components/schemas/DvText'
+        target:
+          $ref: '#/components/schemas/DvEHRURI'
+    RevisionHistoryItem:
+      type: object
+      properties:
+        versionId:
+          $ref: '#/components/schemas/ObjectVersionId'
+        audits:
+          type: array
+          items:
+            $ref: '#/components/schemas/AuditDetails'
+    DvIntervalDvDuration:
+      type: 'null'
+      properties:
+        lower:
+          $ref: '#/components/schemas/DvDuration'
+        upper:
+          $ref: '#/components/schemas/DvDuration'
+        lowerUnbounded:
+          type: boolean
+        upperUnbounded:
+          type: boolean
+        lowerIncluded:
+          type: boolean
+        upperIncluded:
+          type: boolean
+    HierObjectId:
+      type: object
+      properties:
+        value:
+          type: string
+    TerminologyId:
+      type: object
+      properties:
+        value:
+          type: string
+    Item:
+      type: object
+      properties:
+        name:
+          $ref: '#/components/schemas/DvText'
+        archetypeNodeId:
+          type: string
+        uid:
+          $ref: '#/components/schemas/UIDBasedId'
+        archetypeDetails:
+          $ref: '#/components/schemas/Archetyped'
+        feederAudit:
+          type: 'null'
+        links:
+          type:
+          - array
+          - 'null'
+          items:
+            $ref: '#/components/schemas/Link'
+        path:
+          type: string
+    AuditDetails:
+      type: object
+      properties:
+        systemId:
+          type: string
+        timeCommitted:
+          $ref: '#/components/schemas/DvDateTime'
+        changeType:
+          $ref: '#/components/schemas/DvCodedText'
+        description:
+          $ref: '#/components/schemas/DvText'
+        committer:
+          $ref: '#/components/schemas/PartyProxy'
+    Archetyped:
+      type: 'null'
+      properties:
+        archetypeId:
+          $ref: '#/components/schemas/ArchetypeID'
+        templateId:
+          $ref: '#/components/schemas/TemplateId'
+        rmVersion:
+          type: string
+    PartyRef:
+      type: 'null'
+      properties:
+        namespace:
+          type: string
+        type:
+          type: string
+        id:
+          $ref: '#/components/schemas/ObjectId'
+    DvMultimedia:
+      type: 'null'
+      properties:
+        charset:
+          $ref: '#/components/schemas/CodePhrase'
+        language:
+          $ref: '#/components/schemas/CodePhrase'
+        alternateText:
+          type:
+          - string
+          - 'null'
+        uri:
+          $ref: '#/components/schemas/DvURI'
+        data:
+          type:
+          - string
+          - 'null'
+          format: byte
+        mediaType:
+          $ref: '#/components/schemas/CodePhrase'
+        compressionAlgorithm:
+          $ref: '#/components/schemas/CodePhrase'
+        integrityCheck:
+          type:
+          - string
+          - 'null'
+          format: byte
+        integrityCheckAlgorithm:
+          $ref: '#/components/schemas/CodePhrase'
+        size:
+          type: integer
+          format: int32
+        thumbnail:
+          $ref: '#/components/schemas/DvMultimedia'
+    DvIdentifier:
+      type: object
+      properties:
+        issuer:
+          type:
+          - string
+          - 'null'
+        assigner:
+          type:
+          - string
+          - 'null'
+        id:
+          type: string
+        type:
+          type:
+          - string
+          - 'null'
+    FeederAudit:
+      type: 'null'
+      properties:
+        originatingSystemItemIds:
+          type:
+          - array
+          - 'null'
+          items:
+            $ref: '#/components/schemas/DvIdentifier'
+        feederSystemItemIds:
+          type:
+          - array
+          - 'null'
+          items:
+            $ref: '#/components/schemas/DvIdentifier'
+        originalContent:
+          $ref: '#/components/schemas/DvEncapsulated'
+        originatingSystemAudit:
+          $ref: '#/components/schemas/FeederAuditDetails'
+        feederSystemAudit:
+          $ref: '#/components/schemas/FeederAuditDetails'
+    ReferenceRangeDvDuration:
+      type: object
+      properties:
+        range:
+          $ref: '#/components/schemas/DvIntervalDvDuration'
+        meaning:
+          $ref: '#/components/schemas/DvText'
+    DvEHRURI:
+      type: object
+      properties:
+        value:
+          type: string
+          format: uri
+    DvEncapsulated:
+      type: 'null'
+      properties:
+        charset:
+          $ref: '#/components/schemas/CodePhrase'
+        language:
+          $ref: '#/components/schemas/CodePhrase'
+    DvText:
+      type: object
+      properties:
+        value:
+          type: string
+        hyperlink:
+          $ref: '#/components/schemas/DvURI'
+        formatting:
+          type:
+          - string
+          - 'null'
+        mappings:
+          type:
+          - array
+          - 'null'
+          items:
+            $ref: '#/components/schemas/TermMapping'
+        language:
+          $ref: '#/components/schemas/CodePhrase'
+        encoding:
+          $ref: '#/components/schemas/CodePhrase'
+    TermMapping:
+      type: object
+      properties:
+        match:
+          type: string
+        purpose:
+          $ref: '#/components/schemas/DvCodedText'
+        target:
+          $ref: '#/components/schemas/CodePhrase'
+    FeederAuditDetails:
+      type: 'null'
+      properties:
+        systemId:
+          type: string
+        location:
+          $ref: '#/components/schemas/PartyIdentified'
+        provider:
+          $ref: '#/components/schemas/PartyIdentified'
+        subject:
+          $ref: '#/components/schemas/PartyProxy'
+        time:
+          $ref: '#/components/schemas/DvDateTime'
+        versionId:
+          type:
+          - string
+          - 'null'
+        otherDetails:
+          $ref: '#/components/schemas/ItemStructure'
+    PartyProxy:
+      type: 'null'
+      properties:
+        externalRef:
+          $ref: '#/components/schemas/PartyRef'
+    EhrStatus:
+      type: object
+      properties:
+        name:
+          $ref: '#/components/schemas/DvText'
+        archetypeNodeId:
+          type: string
+        uid:
+          $ref: '#/components/schemas/UIDBasedId'
+        archetypeDetails:
+          $ref: '#/components/schemas/Archetyped'
+        feederAudit:
+          $ref: '#/components/schemas/FeederAudit'
+        links:
+          type:
+          - array
+          - 'null'
+          items:
+            $ref: '#/components/schemas/Link'
+        subject:
+          $ref: '#/components/schemas/PartySelf'
+        otherDetails:
+          $ref: '#/components/schemas/ItemStructure'
+        path:
+          type: string
+        is_modifiable:
+          type: boolean
+        is_queryable:
+          type: boolean
+    OriginalVersionEhrStatus:
+      type: object
+      properties:
+        contribution:
+          $ref: '#/components/schemas/ObjectRefObjectId'
+        signature:
+          type:
+          - string
+          - 'null'
+        commitAudit:
+          $ref: '#/components/schemas/AuditDetails'
+        uid:
+          $ref: '#/components/schemas/ObjectVersionId'
+        precedingVersionUid:
+          $ref: '#/components/schemas/ObjectVersionId'
+        otherInputVersionUids:
+          type:
+          - array
+          - 'null'
+          items:
+            $ref: '#/components/schemas/ObjectVersionId'
+        lifecycleState:
+          $ref: '#/components/schemas/DvCodedText'
+        attestations:
+          type:
+          - array
+          - 'null'
+          items:
+            $ref: '#/components/schemas/Attestation'
+        data:
+          $ref: '#/components/schemas/EhrStatus'
+        branch:
+          type: boolean
+        canonicalForm:
+          type: string
+    ReferenceRangeDvDateTime:
+      type: object
+      properties:
+        range:
+          $ref: '#/components/schemas/DvIntervalDvDateTime'
+        meaning:
+          $ref: '#/components/schemas/DvText'
+    DvCodedText:
+      type: 'null'
+      properties:
+        value:
+          type: string
+        hyperlink:
+          $ref: '#/components/schemas/DvURI'
+        formatting:
+          type:
+          - string
+          - 'null'
+        language:
+          $ref: '#/components/schemas/CodePhrase'
+        encoding:
+          $ref: '#/components/schemas/CodePhrase'
+        definingCode:
+          $ref: '#/components/schemas/CodePhrase'
+    RevisionHistory:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/RevisionHistoryItem'
+    VersionedEhrStatus:
+      type: object
+      properties:
+        uid:
+          $ref: '#/components/schemas/HierObjectId'
+        ownerId:
+          $ref: '#/components/schemas/ObjectRefObjectId'
+        timeCreated:
+          $ref: '#/components/schemas/DvDateTime'
+externalDocs:
+  description: EHRbase Documentation
+  url: https://docs.ehrbase.org/

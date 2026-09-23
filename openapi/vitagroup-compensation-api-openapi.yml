@@ -1,0 +1,46 @@
+openapi: 3.2.0
+info:
+  title: HIP EHRbase Compensation API
+  description: 'HIP EHRbase Enterprise operations that are not part of the OSS, but are part of enterprise feature.
+
+    Requires authorization with a tenant user upfront.'
+  version: 2.0.0
+  contact: {}
+servers:
+- url: https://{ehrbaseBaseUrl}
+  description: An example HIP EHRbase API URL.
+  variables:
+    ehrbaseBaseUrl:
+      default: hip-ehrbase.dev
+security:
+- bearerAuth: []
+tags:
+- name: Compensation
+paths:
+  /plugin/transaction-management/ehr/{ehr_id}/contribution/{contribution_id}/rollback:
+    post:
+      tags:
+      - Compensation
+      summary: Rollback
+      operationId: rollback
+      responses:
+        '200':
+          description: ''
+      parameters:
+      - name: ehr_id
+        in: path
+        required: true
+        schema:
+          type: string
+          example: '{{ehrId}}'
+      - name: contribution_id
+        in: path
+        required: true
+        schema:
+          type: string
+          example: c25c5c9c-0463-4ce3-9753-fb6732827859
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer

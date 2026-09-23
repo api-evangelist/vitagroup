@@ -1,0 +1,780 @@
+openapi: 3.2.0
+info:
+  title: EHRbase DIRECTORY API
+  description: 'EHRbase implements the official openEHR REST API. Additionally, EHRbase provides a custom `status` heartbeat endpoint, an Admin API (if activated) and a Status and Metrics API (if activated) for monitoring and maintenance. Note: The openEHR REST API is documented in their official documentation, not here. Please refer to their separate documentation.'
+  license:
+    name: Apache 2.0
+    url: https://github.com/ehrbase/ehrbase/blob/develop/LICENSE.md
+  version: v1
+servers:
+- url: https://sandkiste.ehrbase.org/ehrbase
+  description: Generated server url
+tags:
+- name: Directory
+paths:
+  /rest/openehr/v1/ehr/{ehr_id}/directory:
+    get:
+      tags:
+      - Directory
+      summary: Get folder in directory version at time
+      externalDocs:
+        url: https://specifications.openehr.org/releases/ITS-REST/latest/ehr.html#directory-directory-get-1
+      operationId: getFolderInDirectoryVersionAtTime
+      parameters:
+      - name: ehr_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: version_at_time
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: path
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: Accept
+        in: header
+        required: false
+        schema:
+          type: string
+          default: application/json
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Folder'
+        '204':
+          description: No Content
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Folder'
+        '404':
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Folder'
+    put:
+      tags:
+      - Directory
+      summary: Update directory
+      externalDocs:
+        url: https://specifications.openehr.org/releases/ITS-REST/latest/ehr.html#directory-directory-put
+      operationId: updateDirectory
+      parameters:
+      - name: ehr_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: If-Match
+        in: header
+        required: true
+        schema:
+          $ref: '#/components/schemas/ObjectVersionId'
+      - name: Content-Type
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: Accept
+        in: header
+        required: false
+        schema:
+          type: string
+          default: application/json
+      - name: Prefer
+        in: header
+        required: false
+        schema:
+          type: string
+          default: return=minimal
+      - name: openEHR-VERSION
+        in: header
+        required: false
+        schema:
+          type: string
+      - name: openEHR-AUDIT_DETAILS
+        in: header
+        required: false
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Folder'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Folder'
+        '204':
+          description: No Content
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Folder'
+        '400':
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Folder'
+        '404':
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Folder'
+        '412':
+          description: Precondition Failed
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Folder'
+    post:
+      tags:
+      - Directory
+      summary: Create directory
+      externalDocs:
+        url: https://specifications.openehr.org/releases/ITS-REST/latest/ehr.html#directory-directory-post
+      operationId: createDirectory
+      parameters:
+      - name: ehr_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: openEHR-VERSION
+        in: header
+        required: false
+        schema:
+          type: string
+      - name: openEHR-AUDIT_DETAILS
+        in: header
+        required: false
+        schema:
+          type: string
+      - name: Content-Type
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: Accept
+        in: header
+        required: false
+        schema:
+          type: string
+          default: application/json
+      - name: Prefer
+        in: header
+        required: false
+        schema:
+          type: string
+          default: return=minimal
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Folder'
+        required: true
+      responses:
+        '201':
+          description: Created
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Folder'
+        '400':
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Folder'
+        '404':
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Folder'
+    delete:
+      tags:
+      - Directory
+      summary: Delete directory
+      externalDocs:
+        url: https://specifications.openehr.org/releases/ITS-REST/latest/ehr.html#directory-directory-delete
+      operationId: deleteDirectory
+      parameters:
+      - name: ehr_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: openEHR-VERSION
+        in: header
+        required: false
+        schema:
+          type: string
+      - name: openEHR-AUDIT_DETAILS
+        in: header
+        required: false
+        schema:
+          type: string
+      - name: Accept
+        in: header
+        required: false
+        schema:
+          type: string
+          default: application/json
+      - name: If-Match
+        in: header
+        required: true
+        schema:
+          $ref: '#/components/schemas/ObjectVersionId'
+      responses:
+        '204':
+          description: No Content
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Folder'
+        '400':
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Folder'
+        '404':
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Folder'
+        '412':
+          description: Precondition Failed
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Folder'
+  /rest/openehr/v1/ehr/{ehr_id}/directory/{version_uid}:
+    get:
+      tags:
+      - Directory
+      summary: Get folder in directory version
+      externalDocs:
+        url: https://specifications.openehr.org/releases/ITS-REST/latest/ehr.html#directory-directory-get
+      operationId: getFolderInDirectory
+      parameters:
+      - name: ehr_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: version_uid
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/ObjectVersionId'
+      - name: path
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: Accept
+        in: header
+        required: false
+        schema:
+          type: string
+          default: application/json
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Folder'
+        '404':
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Folder'
+components:
+  schemas:
+    ArchetypeID:
+      type: object
+      properties:
+        qualified_rm_entity:
+          type: string
+          writeOnly: true
+        domain_concept:
+          type: string
+          writeOnly: true
+        rm_originator:
+          type: string
+          writeOnly: true
+        rm_name:
+          type: string
+          writeOnly: true
+        rm_entity:
+          type: string
+          writeOnly: true
+        specialisation:
+          type:
+          - string
+          - 'null'
+        versionId:
+          type:
+          - string
+          - 'null'
+        value:
+          type: string
+        namespace:
+          type:
+          - string
+          - 'null'
+        qualifiedRmEntity:
+          type:
+          - string
+          - 'null'
+        domainConcept:
+          type:
+          - string
+          - 'null'
+        rmOriginator:
+          type:
+          - string
+          - 'null'
+        rmName:
+          type:
+          - string
+          - 'null'
+        rmEntity:
+          type:
+          - string
+          - 'null'
+        semanticId:
+          type: string
+        fullId:
+          type: string
+    DvURI:
+      type: 'null'
+      properties:
+        value:
+          type: string
+          format: uri
+    DvDateTime:
+      type: 'null'
+      properties:
+        normalStatus:
+          $ref: '#/components/schemas/CodePhrase'
+        normalRange:
+          $ref: '#/components/schemas/DvIntervalDvDateTime'
+        otherReferenceRanges:
+          type:
+          - array
+          - 'null'
+          items:
+            $ref: '#/components/schemas/ReferenceRangeDvDateTime'
+        magnitudeStatus:
+          type:
+          - string
+          - 'null'
+        accuracy:
+          $ref: '#/components/schemas/DvDuration'
+        value: {}
+    UIDBasedId:
+      type: 'null'
+      properties:
+        value:
+          type: string
+    ObjectVersionId:
+      type: object
+      properties:
+        value:
+          type: string
+    ItemStructure:
+      type: 'null'
+      properties:
+        name:
+          $ref: '#/components/schemas/DvText'
+        archetypeNodeId:
+          type: string
+        uid:
+          $ref: '#/components/schemas/UIDBasedId'
+        archetypeDetails:
+          $ref: '#/components/schemas/Archetyped'
+        feederAudit:
+          type: 'null'
+        links:
+          type:
+          - array
+          - 'null'
+          items:
+            $ref: '#/components/schemas/Link'
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Item'
+        path:
+          type: string
+    CodePhrase:
+      type: 'null'
+      properties:
+        terminologyId:
+          $ref: '#/components/schemas/TerminologyId'
+        codeString:
+          type: string
+        preferredTerm:
+          type:
+          - string
+          - 'null'
+    DvIntervalDvDateTime:
+      type: 'null'
+      properties:
+        lower:
+          $ref: '#/components/schemas/DvDateTime'
+        upper:
+          $ref: '#/components/schemas/DvDateTime'
+        lowerUnbounded:
+          type: boolean
+        upperUnbounded:
+          type: boolean
+        lowerIncluded:
+          type: boolean
+        upperIncluded:
+          type: boolean
+    DvDuration:
+      type: 'null'
+      properties:
+        normalStatus:
+          $ref: '#/components/schemas/CodePhrase'
+        normalRange:
+          $ref: '#/components/schemas/DvIntervalDvDuration'
+        otherReferenceRanges:
+          type:
+          - array
+          - 'null'
+          items:
+            $ref: '#/components/schemas/ReferenceRangeDvDuration'
+        magnitudeStatus:
+          type:
+          - string
+          - 'null'
+        accuracy:
+          type:
+          - number
+          - 'null'
+          format: double
+        accuracyIsPercent:
+          type:
+          - boolean
+          - 'null'
+        value:
+          type: object
+          properties:
+            units:
+              type: array
+              items:
+                type: object
+                properties:
+                  durationEstimated:
+                    type: boolean
+                  duration:
+                    type: string
+                  timeBased:
+                    type: boolean
+                  dateBased:
+                    type: boolean
+    TemplateId:
+      type: 'null'
+      properties:
+        value:
+          type: string
+    ObjectId:
+      type: object
+      properties:
+        value:
+          type: string
+    ObjectRefObjectId:
+      type: object
+      properties:
+        namespace:
+          type: string
+        type:
+          type: string
+        id:
+          $ref: '#/components/schemas/ObjectId'
+    PartyIdentified:
+      type: 'null'
+      properties:
+        externalRef:
+          $ref: '#/components/schemas/PartyRef'
+        name:
+          type:
+          - string
+          - 'null'
+        identifiers:
+          type:
+          - array
+          - 'null'
+          items:
+            $ref: '#/components/schemas/DvIdentifier'
+    Link:
+      type: object
+      properties:
+        meaning:
+          $ref: '#/components/schemas/DvText'
+        type:
+          $ref: '#/components/schemas/DvText'
+        target:
+          $ref: '#/components/schemas/DvEHRURI'
+    DvIntervalDvDuration:
+      type: 'null'
+      properties:
+        lower:
+          $ref: '#/components/schemas/DvDuration'
+        upper:
+          $ref: '#/components/schemas/DvDuration'
+        lowerUnbounded:
+          type: boolean
+        upperUnbounded:
+          type: boolean
+        lowerIncluded:
+          type: boolean
+        upperIncluded:
+          type: boolean
+    Item:
+      type: object
+      properties:
+        name:
+          $ref: '#/components/schemas/DvText'
+        archetypeNodeId:
+          type: string
+        uid:
+          $ref: '#/components/schemas/UIDBasedId'
+        archetypeDetails:
+          $ref: '#/components/schemas/Archetyped'
+        feederAudit:
+          type: 'null'
+        links:
+          type:
+          - array
+          - 'null'
+          items:
+            $ref: '#/components/schemas/Link'
+        path:
+          type: string
+    TerminologyId:
+      type: object
+      properties:
+        value:
+          type: string
+    Archetyped:
+      type: 'null'
+      properties:
+        archetypeId:
+          $ref: '#/components/schemas/ArchetypeID'
+        templateId:
+          $ref: '#/components/schemas/TemplateId'
+        rmVersion:
+          type: string
+    PartyRef:
+      type: 'null'
+      properties:
+        namespace:
+          type: string
+        type:
+          type: string
+        id:
+          $ref: '#/components/schemas/ObjectId'
+    DvIdentifier:
+      type: object
+      properties:
+        issuer:
+          type:
+          - string
+          - 'null'
+        assigner:
+          type:
+          - string
+          - 'null'
+        id:
+          type: string
+        type:
+          type:
+          - string
+          - 'null'
+    FeederAudit:
+      type: 'null'
+      properties:
+        originatingSystemItemIds:
+          type:
+          - array
+          - 'null'
+          items:
+            $ref: '#/components/schemas/DvIdentifier'
+        feederSystemItemIds:
+          type:
+          - array
+          - 'null'
+          items:
+            $ref: '#/components/schemas/DvIdentifier'
+        originalContent:
+          $ref: '#/components/schemas/DvEncapsulated'
+        originatingSystemAudit:
+          $ref: '#/components/schemas/FeederAuditDetails'
+        feederSystemAudit:
+          $ref: '#/components/schemas/FeederAuditDetails'
+    ReferenceRangeDvDuration:
+      type: object
+      properties:
+        range:
+          $ref: '#/components/schemas/DvIntervalDvDuration'
+        meaning:
+          $ref: '#/components/schemas/DvText'
+    DvEHRURI:
+      type: object
+      properties:
+        value:
+          type: string
+          format: uri
+    DvEncapsulated:
+      type: 'null'
+      properties:
+        charset:
+          $ref: '#/components/schemas/CodePhrase'
+        language:
+          $ref: '#/components/schemas/CodePhrase'
+    DvText:
+      type: object
+      properties:
+        value:
+          type: string
+        hyperlink:
+          $ref: '#/components/schemas/DvURI'
+        formatting:
+          type:
+          - string
+          - 'null'
+        mappings:
+          type:
+          - array
+          - 'null'
+          items:
+            $ref: '#/components/schemas/TermMapping'
+        language:
+          $ref: '#/components/schemas/CodePhrase'
+        encoding:
+          $ref: '#/components/schemas/CodePhrase'
+    TermMapping:
+      type: object
+      properties:
+        match:
+          type: string
+        purpose:
+          $ref: '#/components/schemas/DvCodedText'
+        target:
+          $ref: '#/components/schemas/CodePhrase'
+    FeederAuditDetails:
+      type: 'null'
+      properties:
+        systemId:
+          type: string
+        location:
+          $ref: '#/components/schemas/PartyIdentified'
+        provider:
+          $ref: '#/components/schemas/PartyIdentified'
+        subject:
+          $ref: '#/components/schemas/PartyProxy'
+        time:
+          $ref: '#/components/schemas/DvDateTime'
+        versionId:
+          type:
+          - string
+          - 'null'
+        otherDetails:
+          $ref: '#/components/schemas/ItemStructure'
+    PartyProxy:
+      type: 'null'
+      properties:
+        externalRef:
+          $ref: '#/components/schemas/PartyRef'
+    ReferenceRangeDvDateTime:
+      type: object
+      properties:
+        range:
+          $ref: '#/components/schemas/DvIntervalDvDateTime'
+        meaning:
+          $ref: '#/components/schemas/DvText'
+    Folder:
+      type: object
+      properties:
+        name:
+          $ref: '#/components/schemas/DvText'
+        archetypeNodeId:
+          type: string
+        uid:
+          $ref: '#/components/schemas/UIDBasedId'
+        archetypeDetails:
+          $ref: '#/components/schemas/Archetyped'
+        feederAudit:
+          $ref: '#/components/schemas/FeederAudit'
+        links:
+          type:
+          - array
+          - 'null'
+          items:
+            $ref: '#/components/schemas/Link'
+        items:
+          type:
+          - array
+          - 'null'
+          items:
+            $ref: '#/components/schemas/ObjectRefObjectId'
+        folders:
+          type:
+          - array
+          - 'null'
+          items:
+            $ref: '#/components/schemas/Folder'
+        details:
+          $ref: '#/components/schemas/ItemStructure'
+        path:
+          type: string
+    DvCodedText:
+      type: 'null'
+      properties:
+        value:
+          type: string
+        hyperlink:
+          $ref: '#/components/schemas/DvURI'
+        formatting:
+          type:
+          - string
+          - 'null'
+        language:
+          $ref: '#/components/schemas/CodePhrase'
+        encoding:
+          $ref: '#/components/schemas/CodePhrase'
+        definingCode:
+          $ref: '#/components/schemas/CodePhrase'
+externalDocs:
+  description: EHRbase Documentation
+  url: https://docs.ehrbase.org/

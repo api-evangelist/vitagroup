@@ -1,0 +1,94 @@
+openapi: 3.2.0
+info:
+  title: Vitagroup Admin - Composition API
+  version: v1
+  license:
+    name: Apache 2.0
+    url: https://github.com/ehrbase/ehrbase/blob/develop/LICENSE.md
+  description: 'Operations tagged Admin - Composition across 2 of this provider''s published API definitions: vitagroup-ehrbase-sandbox-live.json, vitagroup-hip-ehrbase-admin.json. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://sandkiste.ehrbase.org/ehrbase
+  description: Generated server url
+- url: http://localhost:8080/ehrbase
+  description: Generated server url
+tags:
+- name: Admin - Composition
+paths:
+  /rest/admin/ehr/{ehr_id}/composition/{composition_id}:
+    delete:
+      tags:
+      - Admin - Composition
+      operationId: deleteComposition_1
+      parameters:
+      - name: ehr_id
+        in: path
+        description: Target EHR id to remove composition from
+        required: true
+        schema:
+          type: string
+      - name: composition_id
+        in: path
+        description: Target Composition id to remove
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Composition has been deleted successfully.
+          headers:
+            Content-Type:
+              description: Format of response
+              style: simple
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminDeleteResponseData'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/AdminDeleteResponseData'
+        '401':
+          description: Client credentials are invalid or have been expired.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminDeleteResponseData'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/AdminDeleteResponseData'
+        '403':
+          description: Client has not permission to access this resource since admin role is missing.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminDeleteResponseData'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/AdminDeleteResponseData'
+        '404':
+          description: EHR or Composition with id could not be found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminDeleteResponseData'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/AdminDeleteResponseData'
+      summary: Delete composition 1
+      x-summary-source: derived
+    servers:
+    - url: https://sandkiste.ehrbase.org/ehrbase
+      description: Generated server url
+components:
+  schemas:
+    AdminDeleteResponseData:
+      type: object
+      properties:
+        deleted:
+          type: integer
+          format: int32
+externalDocs:
+  description: EHRbase Documentation
+  url: https://docs.ehrbase.org/
+x-refined-from:
+- vitagroup-ehrbase-sandbox-live.json
+- vitagroup-hip-ehrbase-admin.json

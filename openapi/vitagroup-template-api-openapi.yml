@@ -1,0 +1,295 @@
+openapi: 3.2.0
+info:
+  title: EHRbase TEMPLATE API
+  description: 'EHRbase implements the official openEHR REST API. Additionally, EHRbase provides a custom `status` heartbeat endpoint, an Admin API (if activated) and a Status and Metrics API (if activated) for monitoring and maintenance. Note: The openEHR REST API is documented in their official documentation, not here. Please refer to their separate documentation.'
+  license:
+    name: Apache 2.0
+    url: https://github.com/ehrbase/ehrbase/blob/develop/LICENSE.md
+  version: v1
+servers:
+- url: https://sandkiste.ehrbase.org/ehrbase
+  description: Generated server url
+tags:
+- name: Template
+paths:
+  /rest/openehr/v1/definition/template/adl1.4/{template_id}/webtemplate:
+    get:
+      tags:
+      - Template
+      summary: Deprecated since 2.2.0 and marked for removal
+      description: Replaced by /rest/openehr/v1/definition/template/adl1.4/{template_id}
+      operationId: getWebTemplate
+      parameters:
+      - name: Accept
+        in: header
+        required: false
+        schema:
+          type: string
+      - name: template_id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WebTemplate'
+            application/openehr.wt+json:
+              schema:
+                $ref: '#/components/schemas/WebTemplate'
+      deprecated: true
+  /rest/ecis/v1/template/{templateId}:
+    get:
+      tags:
+      - Template
+      summary: Deprecated since 2.0.0 and marked for removal
+      description: Replaced by /rest/openehr/v1/definition/template/adl1.4/{template_id}/webtemplate. Note the replacement endpoint provides the Web-Template as it is, without wrapping it in a `webTemplate` property.
+      operationId: getTemplate
+      parameters:
+      - name: templateId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TemplateResponseData'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/TemplateResponseData'
+      deprecated: true
+  /rest/ecis/v1/template/{templateId}/example:
+    get:
+      tags:
+      - Template
+      summary: Deprecated since 2.0.0 and marked for removal
+      description: Replaced by /rest/openehr/v1/definition/template/adl1.4/{template_id}/example
+      operationId: getTemplateExample_1
+      parameters:
+      - name: templateId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: format
+        in: query
+        required: false
+        schema:
+          type: string
+          default: FLAT
+          enum:
+          - FLAT
+          - STRUCTURED
+          - RAW
+          - XML
+          - ECISFLAT
+          - EXPANDED
+          - JSON
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: string
+            application/xml:
+              schema:
+                type: string
+      deprecated: true
+components:
+  schemas:
+    WebTemplateInput:
+      type: object
+      properties:
+        suffix:
+          type: string
+        type:
+          type: string
+        list:
+          type: array
+          items:
+            $ref: '#/components/schemas/WebTemplateInputValue'
+        listOpen:
+          type: boolean
+        validation:
+          $ref: '#/components/schemas/WebTemplateValidation'
+        terminology:
+          type: string
+        defaultValue:
+          type: string
+    WebTemplateTerminology:
+      type: object
+      properties:
+        value:
+          type: string
+        terminologyId:
+          type: string
+    TemplateResponseData: {}
+    WebTemplateInterval:
+      type: object
+      properties:
+        min: {}
+        minOp:
+          type: string
+          enum:
+          - '>='
+          - '>'
+          - <=
+          - <
+        max: {}
+        maxOp:
+          type: string
+          enum:
+          - '>='
+          - '>'
+          - <=
+          - <
+    WebTemplate:
+      type: object
+      properties:
+        templateId:
+          type: string
+        version:
+          type: string
+        defaultLanguage:
+          type: string
+        languages:
+          type: array
+          items:
+            type: string
+        tree:
+          $ref: '#/components/schemas/WebTemplateNode'
+    WebTemplateValidation:
+      type: object
+      properties:
+        precision:
+          $ref: '#/components/schemas/WebTemplateInterval'
+        range:
+          $ref: '#/components/schemas/WebTemplateInterval'
+        pattern:
+          type: string
+    WebTemplateInputValue:
+      type: object
+      properties:
+        value:
+          type: string
+        label:
+          type: string
+        localizedLabels:
+          type: object
+          additionalProperties:
+            type: string
+        localizedDescriptions:
+          type: object
+          additionalProperties:
+            type: string
+        termBindings:
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/WebTemplateTerminology'
+        ordinal:
+          type: integer
+          format: int32
+        currentStates:
+          type: array
+          items:
+            type: string
+        validation:
+          $ref: '#/components/schemas/WebTemplateValidation'
+    WebtemplateCardinality:
+      type: object
+      properties:
+        min:
+          type: integer
+          format: int32
+        max:
+          type: integer
+          format: int32
+        ids:
+          type: array
+          items:
+            type: string
+        excludeFromWebTemplate:
+          type: boolean
+    WebTemplateAnnotation:
+      type: object
+      properties:
+        comment:
+          type: string
+        other:
+          type: object
+          additionalProperties:
+            type: string
+    WebTemplateNode:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        localizedName:
+          type: string
+        rmType:
+          type: string
+        nodeId:
+          type: string
+        min:
+          type: integer
+          format: int32
+        max:
+          type: integer
+          format: int32
+        localizedNames:
+          type: object
+          additionalProperties:
+            type: string
+        localizedDescriptions:
+          type: object
+          additionalProperties:
+            type: string
+        aqlPath:
+          type: string
+        children:
+          type: array
+          items:
+            $ref: '#/components/schemas/WebTemplateNode'
+        inputs:
+          type: array
+          items:
+            $ref: '#/components/schemas/WebTemplateInput'
+        inContext:
+          type: boolean
+        termBindings:
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/WebTemplateTerminology'
+        dependsOn:
+          type: array
+          items:
+            type: string
+        annotations:
+          $ref: '#/components/schemas/WebTemplateAnnotation'
+        proportionTypes:
+          type: array
+          items:
+            type: string
+            enum:
+            - ratio
+            - unitary
+            - percent
+            - fraction
+            - integer_fraction
+        cardinalities:
+          type: array
+          items:
+            $ref: '#/components/schemas/WebtemplateCardinality'
+externalDocs:
+  description: EHRbase Documentation
+  url: https://docs.ehrbase.org/
