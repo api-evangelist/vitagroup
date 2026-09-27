@@ -105,25 +105,6 @@ paths:
       deprecated: true
 components:
   schemas:
-    WebTemplateInput:
-      type: object
-      properties:
-        suffix:
-          type: string
-        type:
-          type: string
-        list:
-          type: array
-          items:
-            $ref: '#/components/schemas/WebTemplateInputValue'
-        listOpen:
-          type: boolean
-        validation:
-          $ref: '#/components/schemas/WebTemplateValidation'
-        terminology:
-          type: string
-        defaultValue:
-          type: string
     WebTemplateTerminology:
       type: object
       properties:
@@ -132,6 +113,21 @@ components:
         terminologyId:
           type: string
     TemplateResponseData: {}
+    WebtemplateCardinality:
+      type: object
+      properties:
+        min:
+          type: integer
+          format: int32
+        max:
+          type: integer
+          format: int32
+        ids:
+          type: array
+          items:
+            type: string
+        excludeFromWebTemplate:
+          type: boolean
     WebTemplateInterval:
       type: object
       properties:
@@ -151,21 +147,6 @@ components:
           - '>'
           - <=
           - <
-    WebTemplate:
-      type: object
-      properties:
-        templateId:
-          type: string
-        version:
-          type: string
-        defaultLanguage:
-          type: string
-        languages:
-          type: array
-          items:
-            type: string
-        tree:
-          $ref: '#/components/schemas/WebTemplateNode'
     WebTemplateValidation:
       type: object
       properties:
@@ -174,6 +155,25 @@ components:
         range:
           $ref: '#/components/schemas/WebTemplateInterval'
         pattern:
+          type: string
+    WebTemplateInput:
+      type: object
+      properties:
+        suffix:
+          type: string
+        type:
+          type: string
+        list:
+          type: array
+          items:
+            $ref: '#/components/schemas/WebTemplateInputValue'
+        listOpen:
+          type: boolean
+        validation:
+          $ref: '#/components/schemas/WebTemplateValidation'
+        terminology:
+          type: string
+        defaultValue:
           type: string
     WebTemplateInputValue:
       type: object
@@ -203,21 +203,6 @@ components:
             type: string
         validation:
           $ref: '#/components/schemas/WebTemplateValidation'
-    WebtemplateCardinality:
-      type: object
-      properties:
-        min:
-          type: integer
-          format: int32
-        max:
-          type: integer
-          format: int32
-        ids:
-          type: array
-          items:
-            type: string
-        excludeFromWebTemplate:
-          type: boolean
     WebTemplateAnnotation:
       type: object
       properties:
@@ -290,6 +275,21 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/WebtemplateCardinality'
+    WebTemplate:
+      type: object
+      properties:
+        templateId:
+          type: string
+        version:
+          type: string
+        defaultLanguage:
+          type: string
+        languages:
+          type: array
+          items:
+            type: string
+        tree:
+          $ref: '#/components/schemas/WebTemplateNode'
 externalDocs:
   description: EHRbase Documentation
   url: https://docs.ehrbase.org/

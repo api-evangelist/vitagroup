@@ -171,6 +171,21 @@ components:
       properties:
         original_language:
           type: string
+    Consequence:
+      type: object
+      properties:
+        name:
+          type: string
+        type:
+          type: string
+          enum:
+          - SPEL
+          - AQL
+          - EL
+        arguments:
+          type: object
+          additionalProperties:
+            type: string
     EventTrigger:
       type: object
       properties:
@@ -206,6 +221,18 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Consequence'
+    Author:
+      type: object
+      properties:
+        date:
+          type: string
+          format: date-time
+        name:
+          type: string
+        email:
+          type: string
+        organisation:
+          type: string
     Definition:
       type: object
       properties:
@@ -232,33 +259,6 @@ components:
           type: array
           items:
             type: string
-    Consequence:
-      type: object
-      properties:
-        name:
-          type: string
-        type:
-          type: string
-          enum:
-          - SPEL
-          - AQL
-          - EL
-        arguments:
-          type: object
-          additionalProperties:
-            type: string
-    Author:
-      type: object
-      properties:
-        date:
-          type: string
-          format: date-time
-        name:
-          type: string
-        email:
-          type: string
-        organisation:
-          type: string
     Condition:
       type: object
       properties:

@@ -10,6 +10,22 @@ description: vitagroup AG is a German health-technology company (Mannheim, HRB 7
   at docs.ehrbase.org, and runs a public unauthenticated sandbox instance at sandkiste.ehrbase.org.
   FHIR and HL7v2 interoperability is provided through the CDR Bridge / FHIR Bridge and
   the openFHIR and FHIRconnect projects.
+deliveryModel:
+  model: saas
+  license_evidence:
+    not_product:
+    - ehrbase/ehrbase
+  open_source: unknown
+  commercial: true
+  callable_host: true
+  label: Hosted service · you call their endpoint
+  confidence: low
+  source:
+  - openapi
+  - pricing
+  - repository-not-product
+  generated: '2026-09-25'
+  method: derived
 image: https://www.vitagroup.ag/wp-content/uploads/2023/09/vitagroup_Vorschau_berry_4zu3-1024x819.png
 url: https://raw.githubusercontent.com/api-evangelist/vitagroup/refs/heads/main/apis.yml
 x-type: company
@@ -27,7 +43,7 @@ tags:
 - Clinical Data Repository
 - Interoperability
 - Germany
-- Open-Source
+- Open Source
 tags_raw:
 - Company
 - Healthcare
@@ -39,6 +55,7 @@ tags_raw:
 - Interoperability
 - Germany
 - Open Source
+- Open-Source
 maintainers:
 - FN: Kin Lane
   email: kin@apievangelist.com
