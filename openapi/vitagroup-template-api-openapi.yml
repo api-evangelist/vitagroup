@@ -105,48 +105,21 @@ paths:
       deprecated: true
 components:
   schemas:
-    WebTemplateTerminology:
+    WebTemplate:
       type: object
       properties:
-        value:
+        templateId:
           type: string
-        terminologyId:
+        version:
           type: string
-    TemplateResponseData: {}
-    WebtemplateCardinality:
-      type: object
-      properties:
-        min:
-          type: integer
-          format: int32
-        max:
-          type: integer
-          format: int32
-        ids:
+        defaultLanguage:
+          type: string
+        languages:
           type: array
           items:
             type: string
-        excludeFromWebTemplate:
-          type: boolean
-    WebTemplateInterval:
-      type: object
-      properties:
-        min: {}
-        minOp:
-          type: string
-          enum:
-          - '>='
-          - '>'
-          - <=
-          - <
-        max: {}
-        maxOp:
-          type: string
-          enum:
-          - '>='
-          - '>'
-          - <=
-          - <
+        tree:
+          $ref: '#/components/schemas/WebTemplateNode'
     WebTemplateValidation:
       type: object
       properties:
@@ -155,6 +128,13 @@ components:
         range:
           $ref: '#/components/schemas/WebTemplateInterval'
         pattern:
+          type: string
+    WebTemplateTerminology:
+      type: object
+      properties:
+        value:
+          type: string
+        terminologyId:
           type: string
     WebTemplateInput:
       type: object
@@ -175,6 +155,7 @@ components:
           type: string
         defaultValue:
           type: string
+    TemplateResponseData: {}
     WebTemplateInputValue:
       type: object
       properties:
@@ -212,6 +193,25 @@ components:
           type: object
           additionalProperties:
             type: string
+    WebTemplateInterval:
+      type: object
+      properties:
+        min: {}
+        minOp:
+          type: string
+          enum:
+          - '>='
+          - '>'
+          - <=
+          - <
+        max: {}
+        maxOp:
+          type: string
+          enum:
+          - '>='
+          - '>'
+          - <=
+          - <
     WebTemplateNode:
       type: object
       properties:
@@ -275,21 +275,21 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/WebtemplateCardinality'
-    WebTemplate:
+    WebtemplateCardinality:
       type: object
       properties:
-        templateId:
-          type: string
-        version:
-          type: string
-        defaultLanguage:
-          type: string
-        languages:
+        min:
+          type: integer
+          format: int32
+        max:
+          type: integer
+          format: int32
+        ids:
           type: array
           items:
             type: string
-        tree:
-          $ref: '#/components/schemas/WebTemplateNode'
+        excludeFromWebTemplate:
+          type: boolean
 externalDocs:
   description: EHRbase Documentation
   url: https://docs.ehrbase.org/
