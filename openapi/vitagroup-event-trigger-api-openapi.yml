@@ -166,6 +166,80 @@ paths:
           description: NOT FOUND
 components:
   schemas:
+    Condition:
+      type: object
+      properties:
+        type:
+          type: string
+        expression:
+          type: string
+    Consequence:
+      type: object
+      properties:
+        name:
+          type: string
+        type:
+          type: string
+          enum:
+          - SPEL
+          - AQL
+          - EL
+        arguments:
+          type: object
+          additionalProperties:
+            type: string
+    Languange:
+      type: object
+      properties:
+        original_language:
+          type: string
+    Author:
+      type: object
+      properties:
+        date:
+          type: string
+          format: date-time
+        name:
+          type: string
+        email:
+          type: string
+        organisation:
+          type: string
+    Rule:
+      type: object
+      properties:
+        name:
+          type: string
+        conditions:
+          type: object
+          additionalProperties:
+            type: string
+          writeOnly: true
+        when:
+          $ref: '#/components/schemas/Condition'
+        then:
+          type: array
+          items:
+            $ref: '#/components/schemas/Consequence'
+    EventTrigger:
+      type: object
+      properties:
+        uuid:
+          type: string
+          format: uuid
+        id:
+          type: string
+        language:
+          $ref: '#/components/schemas/Languange'
+        state:
+          type: string
+          enum:
+          - active
+          - inactive
+        author:
+          $ref: '#/components/schemas/Author'
+        definition:
+          $ref: '#/components/schemas/Definition'
     Definition:
       type: object
       properties:
@@ -192,80 +266,6 @@ components:
           type: array
           items:
             type: string
-    Consequence:
-      type: object
-      properties:
-        name:
-          type: string
-        type:
-          type: string
-          enum:
-          - SPEL
-          - AQL
-          - EL
-        arguments:
-          type: object
-          additionalProperties:
-            type: string
-    Languange:
-      type: object
-      properties:
-        original_language:
-          type: string
-    EventTrigger:
-      type: object
-      properties:
-        uuid:
-          type: string
-          format: uuid
-        id:
-          type: string
-        language:
-          $ref: '#/components/schemas/Languange'
-        state:
-          type: string
-          enum:
-          - active
-          - inactive
-        author:
-          $ref: '#/components/schemas/Author'
-        definition:
-          $ref: '#/components/schemas/Definition'
-    Author:
-      type: object
-      properties:
-        date:
-          type: string
-          format: date-time
-        name:
-          type: string
-        email:
-          type: string
-        organisation:
-          type: string
-    Condition:
-      type: object
-      properties:
-        type:
-          type: string
-        expression:
-          type: string
-    Rule:
-      type: object
-      properties:
-        name:
-          type: string
-        conditions:
-          type: object
-          additionalProperties:
-            type: string
-          writeOnly: true
-        when:
-          $ref: '#/components/schemas/Condition'
-        then:
-          type: array
-          items:
-            $ref: '#/components/schemas/Consequence'
   securitySchemes:
     bearerAuth:
       type: http

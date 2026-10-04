@@ -455,6 +455,58 @@ paths:
                 type: string
 components:
   schemas:
+    ActionRestResponseData:
+      type: object
+      properties:
+        meta:
+          $ref: '#/components/schemas/Meta'
+        action:
+          type: string
+          enum:
+          - RETRIEVE
+          - CREATE
+          - UPDATE
+          - MERGE
+          - DELETE
+    CompositionWriteRestResponseData:
+      type: object
+      properties:
+        meta:
+          $ref: '#/components/schemas/Meta'
+        action:
+          type: string
+          enum:
+          - RETRIEVE
+          - CREATE
+          - UPDATE
+          - MERGE
+          - DELETE
+        compositionUid:
+          type: string
+    StructuredString:
+      type: object
+      properties:
+        format:
+          type: string
+          enum:
+          - XML
+          - JSON
+        value:
+          type: string
+    RestHref:
+      type: object
+      properties:
+        url:
+          type: string
+    Meta:
+      type: object
+      properties:
+        href:
+          $ref: '#/components/schemas/RestHref'
+        precedingHref:
+          $ref: '#/components/schemas/RestHref'
+        nextHref:
+          $ref: '#/components/schemas/RestHref'
     CompositionResponseData:
       type: object
       properties:
@@ -487,58 +539,6 @@ components:
           format: uuid
         compositionUid:
           type: string
-    Meta:
-      type: object
-      properties:
-        href:
-          $ref: '#/components/schemas/RestHref'
-        precedingHref:
-          $ref: '#/components/schemas/RestHref'
-        nextHref:
-          $ref: '#/components/schemas/RestHref'
-    CompositionWriteRestResponseData:
-      type: object
-      properties:
-        meta:
-          $ref: '#/components/schemas/Meta'
-        action:
-          type: string
-          enum:
-          - RETRIEVE
-          - CREATE
-          - UPDATE
-          - MERGE
-          - DELETE
-        compositionUid:
-          type: string
-    StructuredString:
-      type: object
-      properties:
-        format:
-          type: string
-          enum:
-          - XML
-          - JSON
-        value:
-          type: string
-    RestHref:
-      type: object
-      properties:
-        url:
-          type: string
-    ActionRestResponseData:
-      type: object
-      properties:
-        meta:
-          $ref: '#/components/schemas/Meta'
-        action:
-          type: string
-          enum:
-          - RETRIEVE
-          - CREATE
-          - UPDATE
-          - MERGE
-          - DELETE
 externalDocs:
   description: EHRbase Documentation
   url: https://docs.ehrbase.org/
