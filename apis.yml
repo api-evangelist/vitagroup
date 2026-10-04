@@ -643,6 +643,9 @@ apis:
   - type: Sandbox
     url: sandbox/vitagroup-sandbox.yml
 common:
+- type: CapabilityMap
+  url: capabilities/vitagroup-capability-edges.yml
+  name: vitagroup Business Capability Map
 - type: Overlay
   url: overlays/vitagroup-hip-ehrbase-admin-overlay.yaml
 - type: Overlay
