@@ -455,6 +455,30 @@ paths:
                 type: string
 components:
   schemas:
+    Meta:
+      type: object
+      properties:
+        href:
+          $ref: '#/components/schemas/RestHref'
+        precedingHref:
+          $ref: '#/components/schemas/RestHref'
+        nextHref:
+          $ref: '#/components/schemas/RestHref'
+    RestHref:
+      type: object
+      properties:
+        url:
+          type: string
+    StructuredString:
+      type: object
+      properties:
+        format:
+          type: string
+          enum:
+          - XML
+          - JSON
+        value:
+          type: string
     ActionRestResponseData:
       type: object
       properties:
@@ -483,30 +507,6 @@ components:
           - DELETE
         compositionUid:
           type: string
-    StructuredString:
-      type: object
-      properties:
-        format:
-          type: string
-          enum:
-          - XML
-          - JSON
-        value:
-          type: string
-    RestHref:
-      type: object
-      properties:
-        url:
-          type: string
-    Meta:
-      type: object
-      properties:
-        href:
-          $ref: '#/components/schemas/RestHref'
-        precedingHref:
-          $ref: '#/components/schemas/RestHref'
-        nextHref:
-          $ref: '#/components/schemas/RestHref'
     CompositionResponseData:
       type: object
       properties:

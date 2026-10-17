@@ -166,28 +166,25 @@ paths:
           description: NOT FOUND
 components:
   schemas:
-    Condition:
+    EventTrigger:
       type: object
       properties:
-        type:
+        uuid:
           type: string
-        expression:
+          format: uuid
+        id:
           type: string
-    Consequence:
-      type: object
-      properties:
-        name:
-          type: string
-        type:
+        language:
+          $ref: '#/components/schemas/Languange'
+        state:
           type: string
           enum:
-          - SPEL
-          - AQL
-          - EL
-        arguments:
-          type: object
-          additionalProperties:
-            type: string
+          - active
+          - inactive
+        author:
+          $ref: '#/components/schemas/Author'
+        definition:
+          $ref: '#/components/schemas/Definition'
     Languange:
       type: object
       properties:
@@ -221,25 +218,28 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Consequence'
-    EventTrigger:
+    Condition:
       type: object
       properties:
-        uuid:
+        type:
           type: string
-          format: uuid
-        id:
+        expression:
           type: string
-        language:
-          $ref: '#/components/schemas/Languange'
-        state:
+    Consequence:
+      type: object
+      properties:
+        name:
+          type: string
+        type:
           type: string
           enum:
-          - active
-          - inactive
-        author:
-          $ref: '#/components/schemas/Author'
-        definition:
-          $ref: '#/components/schemas/Definition'
+          - SPEL
+          - AQL
+          - EL
+        arguments:
+          type: object
+          additionalProperties:
+            type: string
     Definition:
       type: object
       properties:

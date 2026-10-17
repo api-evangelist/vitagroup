@@ -272,22 +272,6 @@ paths:
                 $ref: '#/components/schemas/QueryResponseData'
 components:
   schemas:
-    MetaData:
-      type: object
-      properties:
-        _href:
-          type: string
-        _type:
-          type: string
-        _schema_version:
-          type: string
-        _created:
-          type: string
-          format: date-time
-        _generator:
-          type: string
-        _executed_aql:
-          type: string
     QueryResponseData:
       type: object
       properties:
@@ -308,6 +292,22 @@ components:
           items:
             type: array
             items: {}
+    MetaData:
+      type: object
+      properties:
+        _href:
+          type: string
+        _type:
+          type: string
+        _schema_version:
+          type: string
+        _created:
+          type: string
+          format: date-time
+        _generator:
+          type: string
+        _executed_aql:
+          type: string
 externalDocs:
   description: EHRbase Documentation
   url: https://docs.ehrbase.org/

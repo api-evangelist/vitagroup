@@ -271,6 +271,11 @@ components:
           format: date-time
         unmerge_data:
           $ref: '#/components/schemas/EhrUnmergeData'
+    ObjectId:
+      type: object
+      properties:
+        value:
+          type: string
     DvDateTime:
       type: object
       properties:
@@ -288,28 +293,78 @@ components:
           $ref: '#/components/schemas/DvDuration'
         value:
           type: object
-    TerminologyId:
+    DvIdentifier:
       type: object
       properties:
-        value:
+        issuer:
           type: string
-    FeederAuditDetails:
+        assigner:
+          type: string
+        id:
+          type: string
+        type:
+          type: string
+    DvEncapsulated:
       type: object
       properties:
-        systemId:
+        charset:
+          $ref: '#/components/schemas/CodePhrase'
+        language:
+          $ref: '#/components/schemas/CodePhrase'
+    ReferenceRangeDvDateTime:
+      type: object
+      properties:
+        range:
+          $ref: '#/components/schemas/DvIntervalDvDateTime'
+        meaning:
+          $ref: '#/components/schemas/DvText'
+    ItemStructure:
+      type: object
+      properties:
+        name:
+          $ref: '#/components/schemas/DvText'
+        archetypeNodeId:
           type: string
-        location:
-          $ref: '#/components/schemas/PartyIdentified'
-        provider:
-          $ref: '#/components/schemas/PartyIdentified'
-        subject:
-          $ref: '#/components/schemas/PartyProxy'
-        time:
+        uid:
+          $ref: '#/components/schemas/UIDBasedId'
+        archetypeDetails:
+          $ref: '#/components/schemas/Archetyped'
+        feederAudit:
+          $ref: '#/components/schemas/FeederAudit'
+        links:
+          type: array
+          items:
+            $ref: '#/components/schemas/Link'
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Item'
+        path:
+          type: string
+    Link:
+      type: object
+      properties:
+        meaning:
+          $ref: '#/components/schemas/DvText'
+        type:
+          $ref: '#/components/schemas/DvText'
+        target:
+          $ref: '#/components/schemas/DvEHRURI'
+    DvIntervalDvDateTime:
+      type: object
+      properties:
+        lower:
           $ref: '#/components/schemas/DvDateTime'
-        versionId:
-          type: string
-        otherDetails:
-          $ref: '#/components/schemas/ItemStructure'
+        upper:
+          $ref: '#/components/schemas/DvDateTime'
+        upperUnbounded:
+          type: boolean
+        lowerIncluded:
+          type: boolean
+        lowerUnbounded:
+          type: boolean
+        upperIncluded:
+          type: boolean
     DvDuration:
       type: object
       properties:
@@ -357,89 +412,6 @@ components:
                     type: boolean
                   dateBased:
                     type: boolean
-    Item:
-      type: object
-      properties:
-        name:
-          $ref: '#/components/schemas/DvText'
-        archetypeNodeId:
-          type: string
-        uid:
-          $ref: '#/components/schemas/UIDBasedId'
-        archetypeDetails:
-          $ref: '#/components/schemas/Archetyped'
-        feederAudit:
-          $ref: '#/components/schemas/FeederAudit'
-        links:
-          type: array
-          items:
-            $ref: '#/components/schemas/Link'
-        path:
-          type: string
-    DvEncapsulated:
-      type: object
-      properties:
-        charset:
-          $ref: '#/components/schemas/CodePhrase'
-        language:
-          $ref: '#/components/schemas/CodePhrase'
-    ObjectId:
-      type: object
-      properties:
-        value:
-          type: string
-    MergeRequestBody:
-      type: object
-      properties:
-        source_ehr:
-          type: string
-          format: uuid
-        target_ehr:
-          type: string
-          format: uuid
-        detail_level:
-          type: string
-          enum:
-          - BASIC
-          - FOLDER_COPY
-        reversible:
-          type: boolean
-        dry_run:
-          type: boolean
-        folder_merge:
-          type: string
-          enum:
-          - BASIC
-          - COPY
-        composition_merge:
-          type: string
-          enum:
-          - BASIC
-          - PERSISTENT
-      required:
-      - reversible
-      - source_ehr
-      - target_ehr
-    TermMapping:
-      type: object
-      properties:
-        match:
-          type: string
-        purpose:
-          $ref: '#/components/schemas/DvCodedText'
-        target:
-          $ref: '#/components/schemas/CodePhrase'
-    DvIdentifier:
-      type: object
-      properties:
-        issuer:
-          type: string
-        assigner:
-          type: string
-        id:
-          type: string
-        type:
-          type: string
     PartyIdentified:
       type: object
       properties:
@@ -451,178 +423,40 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/DvIdentifier'
-    DvCodedText:
+    EhrUnmergeVersionData:
+      type: object
+      properties:
+        uid:
+          type: string
+          format: uuid
+        version:
+          type: integer
+          format: int32
+        sys_period_lower:
+          type: string
+          format: date-time
+        sys_period_upper:
+          type: string
+          format: date-time
+        contribution:
+          type: string
+          format: uuid
+        audit_details:
+          type: string
+          format: uuid
+        data:
+          $ref: '#/components/schemas/Locatable'
+    UIDBasedId:
       type: object
       properties:
         value:
           type: string
-        hyperlink:
-          $ref: '#/components/schemas/DvURI'
-        formatting:
-          type: string
-        language:
-          $ref: '#/components/schemas/CodePhrase'
-        encoding:
-          $ref: '#/components/schemas/CodePhrase'
-        definingCode:
-          $ref: '#/components/schemas/CodePhrase'
     DvURI:
       type: object
       properties:
         value:
           type: string
           format: uri
-    UIDBasedId:
-      type: object
-      properties:
-        value:
-          type: string
-    Link:
-      type: object
-      properties:
-        meaning:
-          $ref: '#/components/schemas/DvText'
-        type:
-          $ref: '#/components/schemas/DvText'
-        target:
-          $ref: '#/components/schemas/DvEHRURI'
-    EhrUnmergeData:
-      type: object
-      properties:
-        ehr_creation:
-          type: string
-          format: date-time
-        ehr_status:
-          $ref: '#/components/schemas/EhrUnmergeVersionedObjectData'
-        contributions:
-          type: array
-          items:
-            type: string
-            format: uuid
-          uniqueItems: true
-        compositions:
-          type: array
-          items:
-            type: string
-            format: uuid
-          uniqueItems: true
-        deletedCompositions:
-          type: array
-          items:
-            $ref: '#/components/schemas/EhrUnmergeVersionedObjectData'
-        folders:
-          type: array
-          items:
-            $ref: '#/components/schemas/EhrUnmergeVersionedObjectData'
-        moved_item_tags:
-          type: array
-          items:
-            type: string
-            format: uuid
-          uniqueItems: true
-        deleted_item_tags:
-          type: array
-          items:
-            $ref: '#/components/schemas/ItemTagDto'
-    ReferenceRangeDvDuration:
-      type: object
-      properties:
-        range:
-          $ref: '#/components/schemas/DvIntervalDvDuration'
-        meaning:
-          $ref: '#/components/schemas/DvText'
-    CodePhrase:
-      type: object
-      properties:
-        terminologyId:
-          $ref: '#/components/schemas/TerminologyId'
-        codeString:
-          type: string
-        preferredTerm:
-          type: string
-    DvIntervalDvDateTime:
-      type: object
-      properties:
-        lower:
-          $ref: '#/components/schemas/DvDateTime'
-        upper:
-          $ref: '#/components/schemas/DvDateTime'
-        upperUnbounded:
-          type: boolean
-        lowerIncluded:
-          type: boolean
-        lowerUnbounded:
-          type: boolean
-        upperIncluded:
-          type: boolean
-    ItemTagDto:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-        target:
-          type: string
-          format: uuid
-        key:
-          type: string
-        value:
-          type: string
-        owner_id:
-          type: string
-          format: uuid
-        target_type:
-          type: string
-          enum:
-          - EHR_STATUS
-          - COMPOSITION
-        target_path:
-          type: string
-    FeederAudit:
-      type: object
-      properties:
-        originatingSystemItemIds:
-          type: array
-          items:
-            $ref: '#/components/schemas/DvIdentifier'
-        feederSystemItemIds:
-          type: array
-          items:
-            $ref: '#/components/schemas/DvIdentifier'
-        originalContent:
-          $ref: '#/components/schemas/DvEncapsulated'
-        originatingSystemAudit:
-          $ref: '#/components/schemas/FeederAuditDetails'
-        feederSystemAudit:
-          $ref: '#/components/schemas/FeederAuditDetails'
-    TemplateId:
-      type: object
-      properties:
-        value:
-          type: string
-    ItemStructure:
-      type: object
-      properties:
-        name:
-          $ref: '#/components/schemas/DvText'
-        archetypeNodeId:
-          type: string
-        uid:
-          $ref: '#/components/schemas/UIDBasedId'
-        archetypeDetails:
-          $ref: '#/components/schemas/Archetyped'
-        feederAudit:
-          $ref: '#/components/schemas/FeederAudit'
-        links:
-          type: array
-          items:
-            $ref: '#/components/schemas/Link'
-        items:
-          type: array
-          items:
-            $ref: '#/components/schemas/Item'
-        path:
-          type: string
     ArchetypeID:
       type: object
       properties:
@@ -663,6 +497,216 @@ components:
           type: string
         fullId:
           type: string
+    ItemTagDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        target:
+          type: string
+          format: uuid
+        key:
+          type: string
+        value:
+          type: string
+        owner_id:
+          type: string
+          format: uuid
+        target_type:
+          type: string
+          enum:
+          - EHR_STATUS
+          - COMPOSITION
+        target_path:
+          type: string
+    MergeOutcomeDto:
+      type: object
+      properties:
+        level:
+          type: string
+          enum:
+          - BASIC
+          - FOLDER_COPY
+        summary:
+          type: string
+    CodePhrase:
+      type: object
+      properties:
+        terminologyId:
+          $ref: '#/components/schemas/TerminologyId'
+        codeString:
+          type: string
+        preferredTerm:
+          type: string
+    FeederAudit:
+      type: object
+      properties:
+        originatingSystemItemIds:
+          type: array
+          items:
+            $ref: '#/components/schemas/DvIdentifier'
+        feederSystemItemIds:
+          type: array
+          items:
+            $ref: '#/components/schemas/DvIdentifier'
+        originalContent:
+          $ref: '#/components/schemas/DvEncapsulated'
+        originatingSystemAudit:
+          $ref: '#/components/schemas/FeederAuditDetails'
+        feederSystemAudit:
+          $ref: '#/components/schemas/FeederAuditDetails'
+    DvCodedText:
+      type: object
+      properties:
+        value:
+          type: string
+        hyperlink:
+          $ref: '#/components/schemas/DvURI'
+        formatting:
+          type: string
+        language:
+          $ref: '#/components/schemas/CodePhrase'
+        encoding:
+          $ref: '#/components/schemas/CodePhrase'
+        definingCode:
+          $ref: '#/components/schemas/CodePhrase'
+    TemplateId:
+      type: object
+      properties:
+        value:
+          type: string
+    DvEHRURI:
+      type: object
+      properties:
+        value:
+          type: string
+          format: uri
+    FeederAuditDetails:
+      type: object
+      properties:
+        systemId:
+          type: string
+        location:
+          $ref: '#/components/schemas/PartyIdentified'
+        provider:
+          $ref: '#/components/schemas/PartyIdentified'
+        subject:
+          $ref: '#/components/schemas/PartyProxy'
+        time:
+          $ref: '#/components/schemas/DvDateTime'
+        versionId:
+          type: string
+        otherDetails:
+          $ref: '#/components/schemas/ItemStructure'
+    DvText:
+      type: object
+      properties:
+        value:
+          type: string
+        hyperlink:
+          $ref: '#/components/schemas/DvURI'
+        formatting:
+          type: string
+        mappings:
+          type: array
+          items:
+            $ref: '#/components/schemas/TermMapping'
+        language:
+          $ref: '#/components/schemas/CodePhrase'
+        encoding:
+          $ref: '#/components/schemas/CodePhrase'
+    ReferenceRangeDvDuration:
+      type: object
+      properties:
+        range:
+          $ref: '#/components/schemas/DvIntervalDvDuration'
+        meaning:
+          $ref: '#/components/schemas/DvText'
+    EhrUnmergeData:
+      type: object
+      properties:
+        ehr_creation:
+          type: string
+          format: date-time
+        ehr_status:
+          $ref: '#/components/schemas/EhrUnmergeVersionedObjectData'
+        contributions:
+          type: array
+          items:
+            type: string
+            format: uuid
+          uniqueItems: true
+        compositions:
+          type: array
+          items:
+            type: string
+            format: uuid
+          uniqueItems: true
+        deletedCompositions:
+          type: array
+          items:
+            $ref: '#/components/schemas/EhrUnmergeVersionedObjectData'
+        folders:
+          type: array
+          items:
+            $ref: '#/components/schemas/EhrUnmergeVersionedObjectData'
+        moved_item_tags:
+          type: array
+          items:
+            type: string
+            format: uuid
+          uniqueItems: true
+        deleted_item_tags:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItemTagDto'
+    MergeRequestBody:
+      type: object
+      properties:
+        source_ehr:
+          type: string
+          format: uuid
+        target_ehr:
+          type: string
+          format: uuid
+        detail_level:
+          type: string
+          enum:
+          - BASIC
+          - FOLDER_COPY
+        reversible:
+          type: boolean
+        dry_run:
+          type: boolean
+        folder_merge:
+          type: string
+          enum:
+          - BASIC
+          - COPY
+        composition_merge:
+          type: string
+          enum:
+          - BASIC
+          - PERSISTENT
+      required:
+      - reversible
+      - source_ehr
+      - target_ehr
+    TerminologyId:
+      type: object
+      properties:
+        value:
+          type: string
+    PartyRef:
+      type: object
+      properties:
+        namespace:
+          type: string
+        type:
+          type: string
+        id:
+          $ref: '#/components/schemas/ObjectId'
     Archetyped:
       type: object
       properties:
@@ -677,34 +721,24 @@ components:
       properties:
         externalRef:
           $ref: '#/components/schemas/PartyRef'
-    EhrUnmergeVersionedObjectData:
+    Item:
       type: object
       properties:
-        versions:
+        name:
+          $ref: '#/components/schemas/DvText'
+        archetypeNodeId:
+          type: string
+        uid:
+          $ref: '#/components/schemas/UIDBasedId'
+        archetypeDetails:
+          $ref: '#/components/schemas/Archetyped'
+        feederAudit:
+          $ref: '#/components/schemas/FeederAudit'
+        links:
           type: array
           items:
-            $ref: '#/components/schemas/EhrUnmergeVersionData'
-        additionalDetails:
-          type: object
-          additionalProperties:
-            type: object
-          writeOnly: true
-    ReferenceRangeDvDateTime:
-      type: object
-      properties:
-        range:
-          $ref: '#/components/schemas/DvIntervalDvDateTime'
-        meaning:
-          $ref: '#/components/schemas/DvText'
-    MergeOutcomeDto:
-      type: object
-      properties:
-        level:
-          type: string
-          enum:
-          - BASIC
-          - FOLDER_COPY
-        summary:
+            $ref: '#/components/schemas/Link'
+        path:
           type: string
     Locatable:
       type: object
@@ -725,61 +759,27 @@ components:
             $ref: '#/components/schemas/Link'
         path:
           type: string
-    PartyRef:
+    EhrUnmergeVersionedObjectData:
       type: object
       properties:
-        namespace:
-          type: string
-        type:
-          type: string
-        id:
-          $ref: '#/components/schemas/ObjectId'
-    EhrUnmergeVersionData:
-      type: object
-      properties:
-        uid:
-          type: string
-          format: uuid
-        version:
-          type: integer
-          format: int32
-        sys_period_lower:
-          type: string
-          format: date-time
-        sys_period_upper:
-          type: string
-          format: date-time
-        contribution:
-          type: string
-          format: uuid
-        audit_details:
-          type: string
-          format: uuid
-        data:
-          $ref: '#/components/schemas/Locatable'
-    DvText:
-      type: object
-      properties:
-        value:
-          type: string
-        hyperlink:
-          $ref: '#/components/schemas/DvURI'
-        formatting:
-          type: string
-        mappings:
+        versions:
           type: array
           items:
-            $ref: '#/components/schemas/TermMapping'
-        language:
-          $ref: '#/components/schemas/CodePhrase'
-        encoding:
-          $ref: '#/components/schemas/CodePhrase'
-    DvEHRURI:
+            $ref: '#/components/schemas/EhrUnmergeVersionData'
+        additionalDetails:
+          type: object
+          additionalProperties:
+            type: object
+          writeOnly: true
+    TermMapping:
       type: object
       properties:
-        value:
+        match:
           type: string
-          format: uri
+        purpose:
+          $ref: '#/components/schemas/DvCodedText'
+        target:
+          $ref: '#/components/schemas/CodePhrase'
 externalDocs:
   description: EHRbase Documentation
   url: https://docs.ehrbase.org/

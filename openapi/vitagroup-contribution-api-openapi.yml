@@ -116,35 +116,6 @@ paths:
                 $ref: '#/components/schemas/Contribution'
 components:
   schemas:
-    Attestation:
-      type: object
-      properties:
-        systemId:
-          type: string
-        timeCommitted:
-          $ref: '#/components/schemas/DvDateTime'
-        changeType:
-          $ref: '#/components/schemas/DvCodedText'
-        description:
-          $ref: '#/components/schemas/DvText'
-        committer:
-          $ref: '#/components/schemas/PartyProxy'
-        attestedView:
-          $ref: '#/components/schemas/DvMultimedia'
-        proof:
-          type:
-          - string
-          - 'null'
-        items:
-          type:
-          - array
-          - 'null'
-          items:
-            $ref: '#/components/schemas/DvEHRURI'
-        reason:
-          $ref: '#/components/schemas/DvText'
-        pending:
-          type: boolean
     DvIntervalDvDuration:
       type: 'null'
       properties:
@@ -160,17 +131,20 @@ components:
           type: boolean
         upperIncluded:
           type: boolean
-    CONTRIBUTION:
+    ObjectId:
       type: object
       properties:
-        uid:
-          $ref: '#/components/schemas/HierObjectId'
-        audit:
-          $ref: '#/components/schemas/AuditDetails'
-        versions:
-          type: array
-          items:
-            $ref: '#/components/schemas/OriginalVersionRMObject'
+        value:
+          type: string
+    ObjectRefObjectId:
+      type: object
+      properties:
+        namespace:
+          type: string
+        type:
+          type: string
+        id:
+          $ref: '#/components/schemas/ObjectId'
     DvDateTime:
       type: 'null'
       properties:
@@ -191,11 +165,30 @@ components:
         accuracy:
           $ref: '#/components/schemas/DvDuration'
         value: {}
-    TerminologyId:
+    RMObject:
+      type: 'null'
+    ReferenceRangeDvDateTime:
       type: object
       properties:
-        value:
-          type: string
+        range:
+          $ref: '#/components/schemas/DvIntervalDvDateTime'
+        meaning:
+          $ref: '#/components/schemas/DvText'
+    DvIntervalDvDateTime:
+      type: 'null'
+      properties:
+        lower:
+          $ref: '#/components/schemas/DvDateTime'
+        upper:
+          $ref: '#/components/schemas/DvDateTime'
+        lowerUnbounded:
+          type: boolean
+        upperUnbounded:
+          type: boolean
+        lowerIncluded:
+          type: boolean
+        upperIncluded:
+          type: boolean
     DvDuration:
       type: 'null'
       properties:
@@ -238,56 +231,47 @@ components:
                     type: boolean
                   dateBased:
                     type: boolean
-    DvMultimedia:
-      type: 'null'
-      properties:
-        charset:
-          $ref: '#/components/schemas/CodePhrase'
-        language:
-          $ref: '#/components/schemas/CodePhrase'
-        alternateText:
-          type:
-          - string
-          - 'null'
-        uri:
-          $ref: '#/components/schemas/DvURI'
-        data:
-          type:
-          - string
-          - 'null'
-          format: byte
-        mediaType:
-          $ref: '#/components/schemas/CodePhrase'
-        compressionAlgorithm:
-          $ref: '#/components/schemas/CodePhrase'
-        integrityCheck:
-          type:
-          - string
-          - 'null'
-          format: byte
-        integrityCheckAlgorithm:
-          $ref: '#/components/schemas/CodePhrase'
-        size:
-          type: integer
-          format: int32
-        thumbnail:
-          $ref: '#/components/schemas/DvMultimedia'
-    RMObject:
-      type: 'null'
-    ObjectId:
+    AuditDetails:
       type: object
+      properties:
+        systemId:
+          type: string
+        timeCommitted:
+          $ref: '#/components/schemas/DvDateTime'
+        changeType:
+          $ref: '#/components/schemas/DvCodedText'
+        description:
+          $ref: '#/components/schemas/DvText'
+        committer:
+          $ref: '#/components/schemas/PartyProxy'
+    CONTRIBUTION:
+      type: object
+      properties:
+        uid:
+          $ref: '#/components/schemas/HierObjectId'
+        audit:
+          $ref: '#/components/schemas/AuditDetails'
+        versions:
+          type: array
+          items:
+            $ref: '#/components/schemas/OriginalVersionRMObject'
+    DvURI:
+      type: 'null'
       properties:
         value:
           type: string
-    TermMapping:
-      type: object
+          format: uri
+    CodePhrase:
+      type: 'null'
       properties:
-        match:
+        terminologyId:
+          $ref: '#/components/schemas/TerminologyId'
+        codeString:
           type: string
-        purpose:
-          $ref: '#/components/schemas/DvCodedText'
-        target:
-          $ref: '#/components/schemas/CodePhrase'
+        preferredTerm:
+          type:
+          - string
+          - 'null'
     DvCodedText:
       type: 'null'
       properties:
@@ -305,109 +289,12 @@ components:
           $ref: '#/components/schemas/CodePhrase'
         definingCode:
           $ref: '#/components/schemas/CodePhrase'
-    ObjectRefObjectId:
+    DvEHRURI:
       type: object
-      properties:
-        namespace:
-          type: string
-        type:
-          type: string
-        id:
-          $ref: '#/components/schemas/ObjectId'
-    DvURI:
-      type: 'null'
       properties:
         value:
           type: string
           format: uri
-    ObjectVersionId:
-      type: object
-      properties:
-        value:
-          type: string
-    HierObjectId:
-      type: object
-      properties:
-        value:
-          type: string
-    ReferenceRangeDvDuration:
-      type: object
-      properties:
-        range:
-          $ref: '#/components/schemas/DvIntervalDvDuration'
-        meaning:
-          $ref: '#/components/schemas/DvText'
-    CodePhrase:
-      type: 'null'
-      properties:
-        terminologyId:
-          $ref: '#/components/schemas/TerminologyId'
-        codeString:
-          type: string
-        preferredTerm:
-          type:
-          - string
-          - 'null'
-    DvIntervalDvDateTime:
-      type: 'null'
-      properties:
-        lower:
-          $ref: '#/components/schemas/DvDateTime'
-        upper:
-          $ref: '#/components/schemas/DvDateTime'
-        lowerUnbounded:
-          type: boolean
-        upperUnbounded:
-          type: boolean
-        lowerIncluded:
-          type: boolean
-        upperIncluded:
-          type: boolean
-    PartyProxy:
-      type: 'null'
-      properties:
-        externalRef:
-          $ref: '#/components/schemas/PartyRef'
-    ReferenceRangeDvDateTime:
-      type: object
-      properties:
-        range:
-          $ref: '#/components/schemas/DvIntervalDvDateTime'
-        meaning:
-          $ref: '#/components/schemas/DvText'
-    Contribution:
-      type: object
-      properties:
-        uid:
-          $ref: '#/components/schemas/HierObjectId'
-        versions:
-          type: array
-          items:
-            $ref: '#/components/schemas/ObjectRefObjectId'
-        audit:
-          $ref: '#/components/schemas/AuditDetails'
-    PartyRef:
-      type: 'null'
-      properties:
-        namespace:
-          type: string
-        type:
-          type: string
-        id:
-          $ref: '#/components/schemas/ObjectId'
-    AuditDetails:
-      type: object
-      properties:
-        systemId:
-          type: string
-        timeCommitted:
-          $ref: '#/components/schemas/DvDateTime'
-        changeType:
-          $ref: '#/components/schemas/DvCodedText'
-        description:
-          $ref: '#/components/schemas/DvText'
-        committer:
-          $ref: '#/components/schemas/PartyProxy'
     DvText:
       type: object
       properties:
@@ -429,12 +316,6 @@ components:
           $ref: '#/components/schemas/CodePhrase'
         encoding:
           $ref: '#/components/schemas/CodePhrase'
-    DvEHRURI:
-      type: object
-      properties:
-        value:
-          type: string
-          format: uri
     OriginalVersionRMObject:
       type: object
       properties:
@@ -470,6 +351,125 @@ components:
           type: boolean
         canonicalForm:
           type: string
+    ReferenceRangeDvDuration:
+      type: object
+      properties:
+        range:
+          $ref: '#/components/schemas/DvIntervalDvDuration'
+        meaning:
+          $ref: '#/components/schemas/DvText'
+    HierObjectId:
+      type: object
+      properties:
+        value:
+          type: string
+    TerminologyId:
+      type: object
+      properties:
+        value:
+          type: string
+    PartyRef:
+      type: 'null'
+      properties:
+        namespace:
+          type: string
+        type:
+          type: string
+        id:
+          $ref: '#/components/schemas/ObjectId'
+    DvMultimedia:
+      type: 'null'
+      properties:
+        charset:
+          $ref: '#/components/schemas/CodePhrase'
+        language:
+          $ref: '#/components/schemas/CodePhrase'
+        alternateText:
+          type:
+          - string
+          - 'null'
+        uri:
+          $ref: '#/components/schemas/DvURI'
+        data:
+          type:
+          - string
+          - 'null'
+          format: byte
+        mediaType:
+          $ref: '#/components/schemas/CodePhrase'
+        compressionAlgorithm:
+          $ref: '#/components/schemas/CodePhrase'
+        integrityCheck:
+          type:
+          - string
+          - 'null'
+          format: byte
+        integrityCheckAlgorithm:
+          $ref: '#/components/schemas/CodePhrase'
+        size:
+          type: integer
+          format: int32
+        thumbnail:
+          $ref: '#/components/schemas/DvMultimedia'
+    Contribution:
+      type: object
+      properties:
+        uid:
+          $ref: '#/components/schemas/HierObjectId'
+        versions:
+          type: array
+          items:
+            $ref: '#/components/schemas/ObjectRefObjectId'
+        audit:
+          $ref: '#/components/schemas/AuditDetails'
+    ObjectVersionId:
+      type: object
+      properties:
+        value:
+          type: string
+    PartyProxy:
+      type: 'null'
+      properties:
+        externalRef:
+          $ref: '#/components/schemas/PartyRef'
+    Attestation:
+      type: object
+      properties:
+        systemId:
+          type: string
+        timeCommitted:
+          $ref: '#/components/schemas/DvDateTime'
+        changeType:
+          $ref: '#/components/schemas/DvCodedText'
+        description:
+          $ref: '#/components/schemas/DvText'
+        committer:
+          $ref: '#/components/schemas/PartyProxy'
+        attestedView:
+          $ref: '#/components/schemas/DvMultimedia'
+        proof:
+          type:
+          - string
+          - 'null'
+        items:
+          type:
+          - array
+          - 'null'
+          items:
+            $ref: '#/components/schemas/DvEHRURI'
+        reason:
+          $ref: '#/components/schemas/DvText'
+        pending:
+          type: boolean
+    TermMapping:
+      type: object
+      properties:
+        match:
+          type: string
+        purpose:
+          $ref: '#/components/schemas/DvCodedText'
+        target:
+          $ref: '#/components/schemas/CodePhrase'
 externalDocs:
   description: EHRbase Documentation
   url: https://docs.ehrbase.org/
