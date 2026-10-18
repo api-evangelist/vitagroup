@@ -400,6 +400,8 @@ apis:
   humanURL: https://docs.ehrbase.org/api/hip-ehrbase/openehr
   baseURL: https://sandkiste.ehrbase.org/ehrbase
   tags:
+  - Electronic Health Records
+  tags_raw:
   - EHR
   properties:
   - type: OpenAPI
